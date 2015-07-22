@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^/office', include('office.urls')),
-    url(r'^login/$', 'django.contrib.auth.views.login',name="my_login"),
+    url(r'^$', 'django.contrib.auth.views.login',name="my_login"),
+    url(r'^logout$', 'django.contrib.auth.views.logout',name="my_logout"),
 
 ]
