@@ -14,12 +14,12 @@ from django.utils.decorators import method_decorator
 
 
 class Office(View):
-	class newPerson(View):
+	class createNewDoc(View):
 		@method_decorator(login_required)
 		def get(self, request):
 			context = RequestContext(request)
 
-			return render_to_response('persons/new.html', context)
+			return render_to_response('create/new.html', context)
 		@method_decorator(login_required)
 		def post(self,request):
 			pass
