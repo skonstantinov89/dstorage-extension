@@ -20,6 +20,5 @@ from office.views import Office
 
 urlpatterns = [
     # url(r'home$', ''''),
-    url(r'$', Office.Test.as_view())
-
+    url(r'$', Office.Test.as_view(), name='test')
 ]

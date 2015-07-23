@@ -41,7 +41,7 @@
         </div>
         {% if user.is_authenticated == False %}
         <div id="navbar" class="navbar-collapse collapse">
-            <form class="navbar-form navbar-right" method='post' action='/office' role="form" name="LoginForm">
+            <form class="navbar-form navbar-right" method='post' action='/login' role="form" name="LoginForm">
               {% csrf_token %}
               {% if next %}
                   <input type="hidden" name="next" value="{{ next }}" />
@@ -55,12 +55,13 @@
               <button type="submit" class="btn btn-success">Вход</button>
             </form>
           </div><!--/.navbar-collapse -->
-        </div>
         {% else %}
-          <div id="navbar" class="navbar-collapse collapse">
-              <p> {{user}} </p>
-              <a href= type="submit" class="btn btn-success">Logout</button>
+          <div id="navbar" class="navbar-collapse collapse" align='right'>
+              <p style='color:white'> {{user.username}}</p>
+              <a href='/logout' type="submit" class="btn btn-success">Logout</a>
+
         {%endif%}
+        </div>
     </nav>
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
@@ -70,7 +71,7 @@
         <p>Чрез текущо заредения модул имате възможност за физическо управление на документи намиращи се в Офис.</p>
       </div>
     </div>
-{% if user.is_authenticated %}
+{% if user.is_authenticated != True %}
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
@@ -104,5 +105,13 @@
         <script src="{% static "js/vendor/bootstrap.min.js"%}"></script>
 
         <script src="{% static "js/main.js"%}"></script>
+    <script type="text/javascript">
+      var error = "{{error}}"
+      if (error != ''){
+        alert(error)
+      }
+    </script>
+
     </body>
+
 </html>

@@ -17,14 +17,15 @@ from django.contrib import admin
 from django.conf.urls import patterns, include, url
 from django.conf import settings
 from django.conf.urls.static import static
-
+from system.views import LoginClass
 
 
 urlpatterns = [
-    # url(r'^admin/', include(admin.site.urls)),
-    url(r'^office', include('office.urls')),
-    url(r'^$', 'django.contrib.auth.views.login',name="my_login"),
-    url(r'^logout$', 'django.contrib.auth.views.logout',name="my_logout"),
-    url(r'^login$', 'django.contrib.auth.views.login',name="my_login"),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^$',      LoginClass.Index.as_view(),     name="index"),
+    url(r'^home$',  LoginClass.Home.as_view(),      name="home"),
+    url(r'^logout$',LoginClass.Logout.as_view(),    name="logout"),
+    url(r'^login$', LoginClass.Login.as_view(),     name="login"),
 
+    url(r'^office', include('office.urls')),
 ]
