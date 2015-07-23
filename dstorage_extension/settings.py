@@ -111,4 +111,3 @@ TEMPLATE_DIRS = (
     )
 
 LOGIN_REDIRECT_URL = '/office'
-# LOGIN_URL = '/'

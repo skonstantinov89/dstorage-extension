@@ -23,3 +23,9 @@ class Office(View):
 		@method_decorator(login_required)
 		def post(self,request):
 			pass
+	class Test(View):
+		@method_decorator(login_required)
+		def get(self, request):
+			context = RequestContext(request)
+			return render_to_response('templates/base.html', context)
+

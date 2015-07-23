@@ -47,12 +47,12 @@
                   <input type="hidden" name="next" value="{{ next }}" />
               {% endif %}
               <div class="form-group">
-                <input type="text" id='username' placeholder="Email" class="form-control">
+                <input type="text" id='username' placeholder="Потребител" class="form-control">
               </div>
               <div class="form-group">
-                <input type="password" id='password' placeholder="Password" class="form-control">
+                <input type="password" id='password' placeholder="Парола" class="form-control">
               </div>
-              <button type="submit" class="btn btn-success">Sign in</button>
+              <button type="submit" class="btn btn-success">Вход</button>
             </form>
           </div><!--/.navbar-collapse -->
         </div>
@@ -94,8 +94,8 @@
   {%endif%}
       <hr>
 
-      <footer>
-        <p>&copy; Company 2015</p>
+      <footer align='center'>
+        <p>&copy; DSK by Direct Services 2015</p>
       </footer>
     </div> <!-- /container -->        
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -104,16 +104,5 @@
         <script src="{% static "js/vendor/bootstrap.min.js"%}"></script>
 
         <script src="{% static "js/main.js"%}"></script>
-
-        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. 
-        <script>
-            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-            e.src='//www.google-analytics.com/analytics.js';
-            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
-        </script>
-        -->
     </body>
 </html>
