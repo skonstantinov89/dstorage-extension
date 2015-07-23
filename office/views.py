@@ -12,7 +12,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-
 class Office(View):
 	class createNewDoc(View):
 		@method_decorator(login_required)
@@ -23,6 +22,7 @@ class Office(View):
 		@method_decorator(login_required)
 		def post(self,request):
 			pass
+			
 	class Test(View):
 		@method_decorator(login_required)
 		def get(self, request):
