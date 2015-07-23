@@ -32,14 +32,14 @@
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
+            <span class="sr-only"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="#">ДСК Разширение</a>
         </div>
-        {% if user.is_authenticated == False %}
+        {% if user.is_authenticated == False or  user.is_authenticated == None %}
         <div id="navbar" class="navbar-collapse collapse">
             <form class="navbar-form navbar-right" method='post' action='/login' role="form" name="LoginForm">
               {% csrf_token %}
@@ -47,19 +47,20 @@
                   <input type="hidden" name="next" value="{{ next }}" />
               {% endif %}
               <div class="form-group">
-                <input type="text" id='username' placeholder="Потребител" class="form-control">
+                <input type="text" id='username' name='username' placeholder="Потребител" class="form-control">
               </div>
               <div class="form-group">
-                <input type="password" id='password' placeholder="Парола" class="form-control">
+                <input type="password" id='password' name='password' placeholder="Парола" class="form-control">
               </div>
               <button type="submit" class="btn btn-success">Вход</button>
             </form>
           </div><!--/.navbar-collapse -->
-        {% else %}
-          <div id="navbar" class="navbar-collapse collapse" align='right'>
-              <p style='color:white'> {{user.username}}</p>
-              <a href='/logout' type="submit" class="btn btn-success">Logout</a>
+        {% elif user.is_authenticated != None %}
 
+          <div id="navbar" class="navbar-collapse collapse" align='right'>
+              <p style='color:white'> {{user.username}}
+              <a href='/logout' type="submit" class="btn btn-success">Logout</a>
+              </p>
         {%endif%}
         </div>
     </nav>
@@ -67,11 +68,11 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
-        <h1>Система за управление на Офис!</h1>
+        <h1>Система за управление на Склад 1 (Офис)!</h1>
         <p>Чрез текущо заредения модул имате възможност за физическо управление на документи намиращи се в Офис.</p>
       </div>
     </div>
-{% if user.is_authenticated != True %}
+{% if user.is_authenticated == True %}
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
@@ -109,6 +110,7 @@
       var error = "{{error}}"
       if (error != ''){
         alert(error)
+        alert({{user.is_authenticated}})
       }
     </script>
 

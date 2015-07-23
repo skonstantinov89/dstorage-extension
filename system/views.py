@@ -22,38 +22,37 @@ class LoginClass(View):
             else:
                 return redirect('login')
     class Home(View):
-        def is_office_user(user):
+        def is_office_user(self,user):
             return user.groups.filter(name='office').exists()
-        def is_central_user(user):
+        def is_central_user(self,user):
             return user.groups.filter(name='central-management').exists()
 
         def get(self, request):
             context = RequestContext(request)
             if request.user.is_authenticated():
-                if is_office_user(request.user):
-                    return redirect('office')
-                elif is_central_user(request.user):
-                    return redirect('central-management')
+                if self.is_office_user(request.user):
+                    return redirect('/office')
+                elif self.is_central_user(request.user):
+                    return redirect('/central-management')
 
     class Login(View):
         def get(self, request):
             context = RequestContext(request)
             return render_to_response('base.html', context)
         def post(self,request):
+            context = RequestContext(request)
             username = request.POST.get('username', '')
             password = request.POST.get('password', '')
             user = authenticate(username = username, password = password)
-            print ('user: '),
-            print (user)
             error = ''
-            if user is not None:
-                print('hey Login -> post')
-                login(request)
-                return redirect('/home')
+            if user != None:
+                login(request, user)
+                error=''
+                return redirect('/home', context)
             else:
                 logout(request)
                 error = 'Невалидно потребителско име или парола'
-                return render_to_response('base.html', {'error': error})
+                return render_to_response('base.html', {'error': error}, context)
 
     class Logout(View):
         def get(self, request):

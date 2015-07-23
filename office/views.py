@@ -17,20 +17,17 @@ class Office(View):
 		@method_decorator(login_required)
 		def get(self, request):
 			context = RequestContext(request)
-
 			return render_to_response('create/new.html', context)
+
 		@method_decorator(login_required)
 		def post(self,request):
 			pass
 			
-	class Test(View):
-		# @method_decorator(login_required)
-		# def get(self, request):
-		# 	print('hey-TEST')
-		# 	context = RequestContext(request)
-		# 	return render_to_response('base.html', context)
-		def post(self, request):
-			print('hey-TEST-post')
+	class Index(View):
+		@method_decorator(login_required)
+		def get(self, request):
 			context = RequestContext(request)
 			return render_to_response('base.html', context)
-
+		# def post(self, request):
+		# 	context = RequestContext(request)
+		# 	return render_to_response('base.html', context)
