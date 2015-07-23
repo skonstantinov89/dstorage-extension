@@ -48,7 +48,7 @@ class LoginClass(View):
             if user != None:
                 login(request, user)
                 error=''
-                return redirect('/home', context)
+                return redirect('/home')
             else:
                 logout(request)
                 error = 'Невалидно потребителско име или парола'

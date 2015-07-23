@@ -21,8 +21,18 @@ class Office(View):
 
 		@method_decorator(login_required)
 		def post(self,request):
-			pass
+			field1 = request.POST.get('field1', '')
+			field2 = request.POST.get('field2', '')
+			field3 = request.POST.get('field3', '')
+			field4 = request.POST.get('field4', '')
+			field5 = request.POST.get('field5', '')
+			field6 = request.POST.get('field6', '')
+			field7 = request.POST.get('field7', '')
+			field8 = request.POST.get('field8', '')
+			field8 = request.POST.get('field9', '')
+
 			
+
 	class Index(View):
 		@method_decorator(login_required)
 		def get(self, request):
