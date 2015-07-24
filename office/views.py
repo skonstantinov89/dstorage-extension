@@ -37,7 +37,7 @@ class Office(View):
 		@method_decorator(login_required)
 		def get(self, request):
 			context = RequestContext(request)
-			return render_to_response('base.html', context)
+			return render_to_response('main/office_main.html', context)
 		# def post(self, request):
 		# 	context = RequestContext(request)
 		# 	return render_to_response('base.html', context)

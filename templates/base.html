@@ -72,30 +72,11 @@
         <p>Чрез текущо заредения модул имате възможност за физическо управление на документи намиращи се в Офис.</p>
       </div>
     </div>
-{% if user.is_authenticated == True %}
-    <div class="container">
-      <!-- Example row of columns -->
-      <div class="row">
-        <div class="col-md-4">
-          <h2>Създаване</h2>
-          <p>Създаване на нови документи към системата</p>
-          <p><a class="btn btn-default" href="#" role="button">Ръчно въвеждане</a></p>
-          <p><a class="btn btn-default" href="#" role="button">Import от файл</a></p>
-        </div>
-        <div class="col-md-4">
-          <h2>Преглед</h2>
-          <p>Преглед и търсене на документи</p>
-          <p><a class="btn btn-default" href="#" role="button">Търсене ...</a></p>
-       </div>
-        <div class="col-md-4">
-          <h2>Операции</h2>
-          <p>Манипулации с документи</p>
-          <p><a class="btn btn-default" href="#" role="button">Преместване</a></p>
-        </div>
-      </div>
-  {%endif%}
-      <hr>
 
+    {% block main %}
+      
+    {% endblock main %}
+    
       <footer align='center'>
         <p>&copy; DSK by Direct Services 2015</p>
       </footer>
