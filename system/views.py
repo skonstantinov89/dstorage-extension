@@ -25,7 +25,7 @@ class LoginClass(View):
         def is_office_user(self,user):
             return user.groups.filter(name='office').exists()
         def is_central_user(self,user):
-            return user.groups.filter(name='central-management').exists()
+            return user.groups.filter(name='central').exists()
 
         def get(self, request):
             context = RequestContext(request)
@@ -34,6 +34,9 @@ class LoginClass(View):
                     return redirect('/office')
                 elif self.is_central_user(request.user):
                     return redirect('/central-management')
+                else:
+                    logout(request)
+                    return redirect ('/')
 
     class Login(View):
         def get(self, request):

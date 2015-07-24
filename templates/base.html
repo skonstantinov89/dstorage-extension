@@ -39,7 +39,7 @@
           </button>
           <a class="navbar-brand" href="#">ДСК Разширение</a>
         </div>
-        {% if user.is_authenticated == False or  user.is_authenticated == None %}
+        {% if user.is_authenticated == False or user.is_authenticated == None %}
         <div id="navbar" class="navbar-collapse collapse">
             <form class="navbar-form navbar-right" method='post' action='/login' role="form" name="LoginForm">
               {% csrf_token %}
@@ -64,19 +64,19 @@
         {%endif%}
         </div>
     </nav>
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <h2>Система за управление на Склад 1 (Офис 1)!</h2>
-        <p>Чрез текущо заредения модул имате възможност за физическо управление на документи намиращи се в Офис.</p>
-      </div>
-    </div>
+        {% if user.is_authenticated == False or user.is_authenticated == None %}
+            <div class="jumbotron">
+          <div class="container" style='padding-top: 150px; padding-bottom: 250px;'>
+              <h2>Добре дошли в системата за управление на хартиени архиви</h2>
+              <p>След вход в системата ще имате достъп до функциите на приложението, в зависимост от предоставените права за профила, с който сте се вписали</p>
+            </div>
+          </div>
+          {%endif%}
 
     {% block main %}
       
     {% endblock main %}
-    
+
       <footer align='center'>
         <p>&copy; DSK by Direct Services 2015</p>
       </footer>

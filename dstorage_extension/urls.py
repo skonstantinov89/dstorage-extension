@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^login$', LoginClass.Login.as_view(),     name="login"),
 
     url(r'^office', include('office.urls')),
+    url(r'^central-management', include('central_management.urls')),
 ]
