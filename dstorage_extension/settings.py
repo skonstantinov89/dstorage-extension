@@ -113,4 +113,8 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
     )
 
-# LOGIN_REDIRECT_URL = '/'
+MEDIA_ROOT =  os.path.join(BASE_DIR, '')
+
+LOGIN_URL = '/'
+LOGOUT_URL = '/logout/'
+LOGIN_REDIRECT_URL = '/'

@@ -22,6 +22,7 @@
         <link rel="stylesheet" href="{% static "css/uikit.min.css"%}" />
         <link rel="stylesheet" href="{% static "css/bootstrap-theme.min.css"%}">
         <link rel="stylesheet" href="{% static "css/main.css"%}">
+        <link rel="stylesheet" href="{% static "css/jquery.dataTables.min.css"%}">
 
         <script src="{% static "js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"%}"></script>
     </head>
@@ -68,11 +69,29 @@
         {% if user.is_authenticated == False or user.is_authenticated == None %}
             <div class="jumbotron">
           <div class="container" style='padding-top: 150px; padding-bottom: 250px;'>
-              <h2>Добре дошли в системата за управление на хартиени архиви</h2>
+              <h2> <b> Добре дошли в системата за управление на хартиени архиви </b> </h2>
               <p>След вход в системата ще имате достъп до функциите на приложението, в зависимост от предоставените права за профила, с който сте се вписали</p>
             </div>
           </div>
           {%endif%}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="{% static "js/vendor/jquery-1.11.2.min.js"%}"><\/script>')</script>
+
+        <script src="{% static "js/vendor/bootstrap.min.js"%}"></script>
+        <script src="{% static "js/vendor/jquery-1.11.2.min.js"%}"></script>
+
+        <script src="{% static "js/uikit.min.js"%}"></script>
+        <script src="{% static "js/main.js"%}"></script>
+        <script src="{% static "js/jquery.dataTables.min.js"%}"></script>
+
+    <script type="text/javascript">
+
+      var error = "{{error}}"
+      if (error != ''){
+        alert(error)
+      }
+
+    </script>
 
     {% block main %}
       
@@ -82,24 +101,6 @@
         <p>&copy; DSK by Direct Services 2015</p>
       </footer>
     </div> <!-- /container -->        
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="{% static "js/vendor/jquery-1.11.2.min.js"%}"><\/script>')</script>
-
-        <script src="{% static "js/vendor/bootstrap.min.js"%}"></script>
-        <script src="{% static "js/vendor/jquery-1.11.2.min.js"%}"></script>
-
-        <script src="{% static "js/uikit.min.js"%}"></script>
-        <script src="{% static "js/main.js"%}"></script>
-
-    <script type="text/javascript">
-
-      var error = "{{error}}"
-      if (error != ''){
-        alert(error)
-        alert({{user.is_authenticated}})
-      }
-
-    </script>
 
 
     </body>
