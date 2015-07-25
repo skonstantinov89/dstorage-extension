@@ -1,0 +1,23 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+<div class="jumbotron" align='center'>
+      <div class="container" align='center'>
+        <h2>Система за управление на Склад 1 (Офис 1)!</h2>
+        <p>От бутона може да изберете да импортирате файл с данни.</p>
+      </div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>{{ form.non_field_errors }}</p>
+            <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
+            <p>
+                {{ form.docfile.errors }}
+                {{ form.docfile }}
+            </p>
+            <p><input type="submit" value="Upload" /></p>
+        </form>
+</div>
+
+
+{%endblock%}

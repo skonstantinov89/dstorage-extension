@@ -1,0 +1,36 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h2>Система за управление на Склад 2 (Централно управление)!</h2>
+        <p>Чрез текущо заредения модул имате възможност за физическо управление на документи намиращи се в Централно управление.</p>
+      </div>
+    </div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-4">
+          <h2>Приемане</h2>
+          <p>Приемане и проверка на документи пристигнали от Офис 2 (Централно управление)</p>
+          <p><a class="btn btn-default btn-block" href="#" role="button">Приемане</a></p>
+          <p><a class="btn btn-default btn-block" href="#" role="button">Проверка</a></p>
+          <p><a class="btn btn-default btn-block" href="#" role="button">Добавяне</a></p>
+        </div>
+        <div class="col-md-4">
+          <h2>Преглед</h2>
+          <p>Преглед и търсене на документи намиращи се в Офис 2 (Централно управление)</p>
+          <p><a class="btn btn-default btn-block" href="#" role="button">Търсене</a></p>
+       </div>
+        <div class="col-md-4">
+          <h2>Операции</h2>
+          <p>Манипулации с документи намиращи се в Офис 2 (Централно управление)</p>
+          <p><a class="btn btn-default btn-block" href="#" role="button">Преместване в архив</a></p>
+        </div>
+      </div>
+      <hr>
+{% endblock %}

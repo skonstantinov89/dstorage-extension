@@ -37,7 +37,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'office'
+    'office',
+    'central_management',
+    'system',
+    'debug_toolbar'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -110,4 +113,4 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
     )
 
-LOGIN_REDIRECT_URL = '/office'
+# LOGIN_REDIRECT_URL = '/'
