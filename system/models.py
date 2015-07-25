@@ -20,9 +20,10 @@ class Document(models.Model):
     active = models.BooleanField(default = True)
     status = models.TextField()
     location = models.TextField()
-    officeStartDate = models.DateField()
-    centralManagementStartDate = models.DateField()
-    archiveStartDate = models.DateField()
+    officeStartDate = models.DateField(blank = True, null = True)
+    centralManagementStartDate = models.DateField(blank = True, null = True)
+    archiveStartDate = models.DateField(blank = True, null=True)
+    userID = models.ForeignKey(User)
     
 class Criterion(models.Model):
     documentID = models.ForeignKey(Document)
@@ -32,7 +33,9 @@ class Criterion(models.Model):
 
 class Requests(models.Model):
     '''
-    protocolID has to be the autoincrement for every new bundle of requests, so there will be more documents in one paper protocol.
+    protocolID has to be the autoincrement 
+    for every new bundle of requests, so 
+    there will be more documents in one paper protocol.
     status = {
                 in-progress,
                 accepted,
@@ -47,4 +50,7 @@ class Requests(models.Model):
     fromLocation = models.TextField()
     toLocation = models.TextField()
     protocolID = models.IntegerField()
+
+class Files(models.Model):
+    docfile = models.FileField(upload_to='files/%Y%m%d')
 
