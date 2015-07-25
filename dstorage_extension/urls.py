@@ -27,6 +27,6 @@ urlpatterns = [
     url(r'^logout$',LoginClass.Logout.as_view(),    name="logout"),
     url(r'^login$', LoginClass.Login.as_view(),     name="login"),
 
-    url(r'^office', include('office.urls')),
+    url(r'^office',             include('office.urls')),
     url(r'^central-management', include('central_management.urls')),
 ]

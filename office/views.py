@@ -12,6 +12,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
+from system.models import Document, Requests, Criterion
+
 class Office(View):
 	class createNewDoc(View):
 		@method_decorator(login_required)
@@ -21,15 +23,20 @@ class Office(View):
 
 		@method_decorator(login_required)
 		def post(self,request):
-			field1 = request.POST.get('field1', '')
-			field2 = request.POST.get('field2', '')
-			field3 = request.POST.get('field3', '')
-			field4 = request.POST.get('field4', '')
-			field5 = request.POST.get('field5', '')
-			field6 = request.POST.get('field6', '')
-			field7 = request.POST.get('field7', '')
-			field8 = request.POST.get('field8', '')
-			field8 = request.POST.get('field9', '')
+			field = []
+			for i in range(1,10):
+				field.append(request.POST.get('field' + str(i), ''))
+			# field2 = request.POST.get('field2', '')
+			# field3 = request.POST.get('field3', '')
+			# field4 = request.POST.get('field4', '')
+			# field5 = request.POST.get('field5', '')
+			# field6 = request.POST.get('field6', '')
+			# field7 = request.POST.get('field7', '')
+			# field8 = request.POST.get('field8', '')
+			# field8 = request.POST.get('field9', '')
+			print (field)
+
+
 
 			
 
