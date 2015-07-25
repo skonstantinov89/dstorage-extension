@@ -1,0 +1,52 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+  <meta http-equiv="refresh" content="5;url=/office">
+    <div class="jumbotron">
+      <div class="container">
+        <table class="table table-bordered table-hover" id = 'table'>
+        <thead style='text-align: center'>
+            <tr>
+                <th>ИД</th>
+                <th>Индекси</th>
+                <th>Статус</th>
+                <th>Приет в Офис</th>
+                <th>Приет в Централно управление</th>
+                <th>Приет в Склад</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for eachElement in frontData%}
+            <tr align='left'>
+                <td style="vertical-align:middle"> {{eachElement.document.id}} </td>
+                <td style="vertical-align:middle"> 
+                    {% for eachField in eachElement.fields  %}
+                        {{eachField.type}} : {{eachField.value}} </br>
+                    {% endfor %}
+                </td>
+                <td style="vertical-align:middle"> {{eachElement.document.officeStartDate}}</td>
+                <td style="vertical-align:middle"> {{eachElement.document.centralManagementStartDate}}</td>
+                <td style="vertical-align:middle"> {{eachElement.document.archiveStartDate}}</td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+  </div>
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#table').DataTable({
+        "iDisplayLength": 50,
+        "bLengthChange": false,
+        "autoWidth": true,
+        "bFilter": false
+        });
+    });
+    </script>
+
+
+
+      </div>
+    </div>
+    {%endblock%}

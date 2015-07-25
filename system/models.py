@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+class Files(models.Model):
+    docfile = models.FileField(upload_to='files/%Y%m%d')
+
 class Document(models.Model):
     '''
     status = { 
@@ -24,6 +27,7 @@ class Document(models.Model):
     centralManagementStartDate = models.DateField(blank = True, null = True)
     archiveStartDate = models.DateField(blank = True, null=True)
     userID = models.ForeignKey(User)
+    fileID = models.ForeignKey(Files)
     
 class Criterion(models.Model):
     documentID = models.ForeignKey(Document)
@@ -51,6 +55,4 @@ class Requests(models.Model):
     toLocation = models.TextField()
     protocolID = models.IntegerField()
 
-class Files(models.Model):
-    docfile = models.FileField(upload_to='files/%Y%m%d')
 

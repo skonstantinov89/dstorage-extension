@@ -14,16 +14,28 @@ from django.utils.decorators import method_decorator
 
 from system.models import Document, Requests, Criterion, Files
 from office.forms import DocumentForm
-import datetime
+import datetime, codecs, csv
 
 class Office(View):
+    class Preview(View):
+        @method_decorator(login_required)
+        def get(self, request):
+            context = RequestContext(request)
+            frontData = []
+            documentData = Document.objects.all()
+            for eachDocument in documentData:
+                frontData.append({
+                    'document': eachDocument,
+                    'fields': Criterion.objects.filter(documentID = eachDocument.id),
+                    })
+            return render_to_response('preview/preview.html', locals(), context)
+
     class createBulk(View):
         @method_decorator(login_required)
         def get(self, request):
             context = RequestContext(request)
             form = DocumentForm() # A empty, unbound form
-            return render_to_response ('create/bulk.html',{'form': form}, context)
-
+            return render_to_response ('create/bulk.html',locals(), context)
 
         @method_decorator(login_required)
         def post(self, request):
@@ -32,7 +44,21 @@ class Office(View):
             if form.is_valid():
                 newdoc = Files(docfile = request.FILES['docfile'])
                 newdoc.save()
-                return render_to_response('create/success.html',{'form':form}, context)
+                infilename = newdoc.docfile.url
+                mainarray = []
+                with codecs.open(infilename, 'r', 'utf-8') as csvfile:
+                    csvReader = csv.reader(csvfile, delimiter='|')
+                    next(csvReader)  # skip header
+                    for record in csvReader:
+                        mainarray.append(record)
+                    for eachElement in mainarray:
+                        if len(eachElement) != 9:
+                            return render_to_response('create/file_struct_error.html', context)
+                    else:
+                        raise
+                        # HAVE TO CLARIFY WHAT WILL BE THE FILE STRUCT
+
+                return render_to_response('create/success.html',locals(), context)
 
     class createNewDoc(View):
         @method_decorator(login_required)
