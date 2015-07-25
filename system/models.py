@@ -27,7 +27,7 @@ class Document(models.Model):
     centralManagementStartDate = models.DateField(blank = True, null = True)
     archiveStartDate = models.DateField(blank = True, null=True)
     userID = models.ForeignKey(User)
-    fileID = models.ForeignKey(Files)
+    fileID = models.ForeignKey(Files, blank=True, null=True)
     
 class Criterion(models.Model):
     documentID = models.ForeignKey(Document)

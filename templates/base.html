@@ -74,15 +74,6 @@
             </div>
           </div>
           {%endif%}
-
-    {% block main %}
-      
-    {% endblock main %}
-
-      <footer align='center'>
-        <p>&copy; DSK by Direct Services 2015</p>
-      </footer>
-    </div> <!-- /container -->        
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="{% static "js/vendor/jquery-1.11.2.min.js"%}"><\/script>')</script>
 
@@ -101,6 +92,15 @@
       }
 
     </script>
+
+    {% block main %}
+      
+    {% endblock main %}
+
+      <footer align='center'>
+        <p>&copy; DSK by Direct Services 2015</p>
+      </footer>
+    </div> <!-- /container -->        
 
 
     </body>

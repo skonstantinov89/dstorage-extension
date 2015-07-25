@@ -2,7 +2,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block main %}
-  <meta http-equiv="refresh" content="5;url=/office">
     <div class="jumbotron">
       <div class="container">
         <table class="table table-bordered table-hover" id = 'table'>
@@ -22,12 +21,42 @@
                 <td style="vertical-align:middle"> {{eachElement.document.id}} </td>
                 <td style="vertical-align:middle"> 
                     {% for eachField in eachElement.fields  %}
-                        {{eachField.type}} : {{eachField.value}} </br>
+                        {{eachField.criteriaType}} : {{eachField.criteriaValue}} </br>
                     {% endfor %}
                 </td>
-                <td style="vertical-align:middle"> {{eachElement.document.officeStartDate}}</td>
-                <td style="vertical-align:middle"> {{eachElement.document.centralManagementStartDate}}</td>
-                <td style="vertical-align:middle"> {{eachElement.document.archiveStartDate}}</td>
+
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.document.status == 'in-warehouse' %}
+                        Наличен
+                    {% elif eachElement.document.status == 'in-courier' %}
+                        В транзит
+                    {% elif eachElement.document.status == 'destroyed' %}
+                        Унищожен
+                    {% elif eachElement.document.status == 'incorrect-input' %}
+                        Неправилно въведен
+                    {% endif %}
+                </td>
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.document.officeStartDate == None %}
+                        ----
+                    {% else %}
+                        {{eachElement.document.officeStartDate}}
+                    {% endif %}
+                </td>
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.document.centralManagementStartDate == None %}
+                        ----
+                    {% else %}
+                        {{eachElement.document.centralManagementStartDate}}
+                    {% endif %}
+                </td>
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.document.archiveStartDate == None %}
+                        ----
+                    {% else %}
+                        {{eachElement.document.archiveStartDate}}
+                    {% endif %}
+                </td>
             </tr>
             {%endfor%}
         </tbody>
@@ -40,13 +69,46 @@
         "iDisplayLength": 50,
         "bLengthChange": false,
         "autoWidth": true,
-        "bFilter": false
+        "bFilter": true,
+        'bSort': true,
+        'language': {
+                        "sProcessing":   "Обработка на резултатите...",
+                        "sLengthMenu":   "Показване на _MENU_ резултата",
+                        "sZeroRecords":  "Няма намерени резултати",
+                        "sInfo":         "Показване на резултати от _START_ до _END_ от общо _TOTAL_",
+                        "sInfoEmpty":    "Показване на резултати от 0 до 0 от общо 0",
+                        "sInfoFiltered": "(филтрирани от общо _MAX_ резултата)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Търсене във всички колони:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Първа",
+                            "sPrevious": "Предишна",
+                            "sNext":     "Следваща",
+                            "sLast":     "Последна"
+                        }
+                    }
         });
     });
     </script>
 
-
-
       </div>
     </div>
     {%endblock%}
+    {
+    "sProcessing":   "Обработка на резултатите...",
+    "sLengthMenu":   "Показване на _MENU_ резултата",
+    "sZeroRecords":  "Няма намерени резултати",
+    "sInfo":         "Показване на резултати от _START_ до _END_ от общо _TOTAL_",
+    "sInfoEmpty":    "Показване на резултати от 0 до 0 от общо 0",
+    "sInfoFiltered": "(филтрирани от общо _MAX_ резултата)",
+    "sInfoPostFix":  "",
+    "sSearch":       "Търсене във всички колони:",
+    "sUrl":          "",
+    "oPaginate": {
+        "sFirst":    "Първа",
+        "sPrevious": "Предишна",
+        "sNext":     "Следваща",
+        "sLast":     "Последна"
+    }
+}
