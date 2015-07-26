@@ -6,3 +6,4 @@
 .pydevproject
 *.project
 .settings/org.eclipse.core.resources.prefs
+*.pyc
