@@ -42,7 +42,7 @@ class Requests(models.Model):
     there will be more documents in one paper protocol.
     status = {
                 in-progress,
-                accepted,
+                waiting-to-verify,
                 verified,
                 not-verified,
     }
