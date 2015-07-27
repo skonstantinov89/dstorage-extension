@@ -42,6 +42,8 @@ class Office(View):
             context = RequestContext(request)
             form = DocumentForm(request.POST, request.FILES)
             if form.is_valid():
+                recordsCount = request.POST.get('recordsCount', '')
+                recordsCount = int(recordsCount)
                 newdoc = Files(docfile = request.FILES['docfile'])
                 newdoc.save()
                 infilename = newdoc.docfile.url
@@ -55,9 +57,75 @@ class Office(View):
                         if len(eachElement) != 9:
                             return render_to_response('create/file_struct_error.html', context)
                     else:
-                        raise
-                        # HAVE TO CLARIFY WHAT WILL BE THE FILE STRUCT
-
+                        if len(mainarray) != recordsCount:
+                            return render_to_response('create/incorrect_count.html', context)
+                        else:
+                            criterionsList = []
+                            for fields in mainarray:
+                                newDocument = Document.objects.create(
+                                            active = True,
+                                            status = 'in-warehouse',
+                                            location = 'storage 1',
+                                            officeStartDate = datetime.datetime.now(),
+                                            centralManagementStartDate = None,
+                                            archiveStartDate = None,
+                                            userID = request.user
+                                      )
+                                criterionsList.append(Criterion(
+                                                                documentID = newDocument,
+                                                                criteriaType = 'field1',
+                                                                criteriaValue = fields[0],
+                                                           )
+                                                )
+                                criterionsList.append(Criterion(
+                                                                documentID = newDocument,
+                                                                criteriaType = 'field2',
+                                                                criteriaValue = fields[1],
+                                                           )
+                                                )
+                                criterionsList.append(Criterion(
+                                                                documentID = newDocument,
+                                                                criteriaType = 'field3',
+                                                                criteriaValue = fields[2],
+                                                           )
+                                                )
+                                criterionsList.append(Criterion(
+                                                                documentID = newDocument,
+                                                                criteriaType = 'field4',
+                                                                criteriaValue = fields[3],
+                                                           )
+                                                )
+                                criterionsList.append(Criterion(
+                                                                documentID = newDocument,
+                                                                criteriaType = 'field5',
+                                                                criteriaValue = fields[4],
+                                                           )
+                                                )
+                                criterionsList.append(Criterion(
+                                                                documentID = newDocument,
+                                                                criteriaType = 'field6',
+                                                                criteriaValue = fields[5],
+                                                           )
+                                                )
+                                criterionsList.append(Criterion(
+                                                                documentID = newDocument,
+                                                                criteriaType = 'field7',
+                                                                criteriaValue = fields[6],
+                                                           )
+                                                )
+                                criterionsList.append(Criterion(
+                                                                documentID = newDocument,
+                                                                criteriaType = 'field8',
+                                                                criteriaValue = fields[7],
+                                                           )
+                                                )
+                                criterionsList.append(Criterion(
+                                                                documentID = newDocument,
+                                                                criteriaType = 'field9',
+                                                                criteriaValue = fields[8],
+                                                           )
+                                                )
+                            Criterion.objects.bulk_create(criterionsList)
                 return render_to_response('create/success.html',locals(), context)
 
     class createNewDoc(View):
@@ -97,6 +165,3 @@ class Office(View):
         def get(self, request):
             context = RequestContext(request)
             return render_to_response('main/office_main.html', context)
-        # def post(self, request):
-        #   context = RequestContext(request)
-        #   return render_to_response('base.html', context)
