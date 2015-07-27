@@ -1,0 +1,13 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+    <div class="jumbotron">
+      <div class="container">
+        <div class='alert alert-danger'>
+        <h2>Въвеждането на документ беше неуспешно, файла е некоректен - има разминаване в очаквания брой документи!</h2>
+        <p> Проверете коректността на файла и опитайте отново! </p>
+        </div>
+      </div>
+    </div>
+    {%endblock%}

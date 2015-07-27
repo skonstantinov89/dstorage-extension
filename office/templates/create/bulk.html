@@ -10,6 +10,11 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <p>{{ form.non_field_errors }}</p>
+            <p>{{ form.recordsCount.label_tag }} {{ form.recordsCount.help_text }}</p>
+            <p>
+                {{ form.recordsCount.errors }}
+                {{ form.recordsCount }}
+            </p>
             <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
             <p>
                 {{ form.docfile.errors }}
