@@ -3,8 +3,3 @@
 *.project
 .settings/org.eclipse.core.resources.prefs
 *.pyc
-<<<<<<< HEAD
-=======
-*.pyc
-*.pyc
->>>>>>> stoyan
