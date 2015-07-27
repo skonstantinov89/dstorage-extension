@@ -9,7 +9,7 @@ from django.template import RequestContext
 # from system.forms import LoginForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 
 from system.models import Document, Requests, Criterion, Files
@@ -19,6 +19,7 @@ import datetime, codecs, csv
 class Office(View):
     class Preview(View):
         @method_decorator(login_required)
+        @method_decorator(permission_required('system.views.LoginClass.Home.is_office_user'))
         def get(self, request):
             context = RequestContext(request)
             frontData = []
