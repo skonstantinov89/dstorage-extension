@@ -9,7 +9,7 @@ from django.template import RequestContext
 # from system.forms import LoginForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from system.models import Document, Requests, Criterion, Files
@@ -19,7 +19,6 @@ import datetime, codecs, csv
 class Office(View):
     class Preview(View):
         @method_decorator(login_required)
-        @method_decorator(permission_required('system.views.LoginClass.Home.is_office_user'))
         def get(self, request):
             context = RequestContext(request)
             frontData = []
@@ -33,14 +32,12 @@ class Office(View):
 
     class createBulk(View):
         @method_decorator(login_required)
-        @method_decorator(permission_required('system.views.LoginClass.Home.is_office_user'))
         def get(self, request):
             context = RequestContext(request)
             form = DocumentForm() # A empty, unbound form
             return render_to_response ('create/bulk.html',locals(), context)
 
         @method_decorator(login_required)
-        @method_decorator(permission_required('system.views.LoginClass.Home.is_office_user'))
         def post(self, request):
             context = RequestContext(request)
             form = DocumentForm(request.POST, request.FILES)
@@ -65,13 +62,11 @@ class Office(View):
 
     class createNewDoc(View):
         @method_decorator(login_required)
-        @method_decorator(permission_required('system.views.LoginClass.Home.is_office_user'))
         def get(self, request):
             context = RequestContext(request)
             return render_to_response('create/new.html', context)
 
         @method_decorator(login_required)
-        @method_decorator(permission_required('system.views.LoginClass.Home.is_office_user'))
         def post(self,request):
             context = RequestContext(request)
             fields = {}
@@ -99,7 +94,6 @@ class Office(View):
 
     class Index(View):
         @method_decorator(login_required)
-        @method_decorator(permission_required('system.views.LoginClass.Home.is_office_user'))
         def get(self, request):
             context = RequestContext(request)
             return render_to_response('main/office_main.html', context)
