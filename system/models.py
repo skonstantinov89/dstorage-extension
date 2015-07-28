@@ -33,8 +33,15 @@ class Criterion(models.Model):
     # Трябва да ни се дадат кои ще са критериите,
     # Понеже така ще стане много сложно
     documentID = models.ForeignKey(Document)
-    criteriaType = models.TextField()
-    criteriaValue = models.TextField()
+    field1 = models.TextField(blank=True, null=True)
+    field2 = models.TextField(blank=True, null=True)
+    field3 = models.TextField(blank=True, null=True)
+    field4 = models.TextField(blank=True, null=True)
+    field5 = models.TextField(blank=True, null=True)
+    field6 = models.TextField(blank=True, null=True)
+    field7 = models.TextField(blank=True, null=True)
+    field8 = models.TextField(blank=True, null=True)
+    field9 = models.TextField(blank=True, null=True)
 
 
 class Requests(models.Model):
