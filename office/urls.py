@@ -20,8 +20,8 @@ from office.views import Office
 
 urlpatterns = [
     # url(r'home$', ''''),
-    url(r'preview$',             Office.Preview.as_view(),          name='preview'),
+    url(r'preview$',             Office.preview.as_view(),          name='preview'),
     url(r'create-new$',          Office.createNewDoc.as_view(),     name='createNewDoc'),
     url(r'create-bulk$',         Office.createBulk.as_view(),       name='createBulk'),
-    url(r'$',                    Office.Index.as_view(),            name='index'),
+    url(r'$',                    Office.index.as_view(),            name='index'),
 ]

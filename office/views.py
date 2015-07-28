@@ -17,7 +17,10 @@ from office.forms import DocumentForm
 import datetime, codecs, csv
 
 class Office(View):
-    class Preview(View):
+    class moveToCentral(View):
+        pass
+
+    class preview(View):
         @method_decorator(login_required)
         def get(self, request):
             context = RequestContext(request)
@@ -160,7 +163,7 @@ class Office(View):
             Criterion.objects.bulk_create(criterionsList)
             return render_to_response ('create/success.html', context)
 
-    class Index(View):
+    class index(View):
         @method_decorator(login_required)
         def get(self, request):
             context = RequestContext(request)
