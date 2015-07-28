@@ -121,56 +121,15 @@ class Office(View):
                                       )
                                 criterionsList.append(Criterion(
                                                                 documentID = newDocument,
-                                                                criteriaType = 'field1',
-                                                                criteriaValue = fields[0],
-                                                           )
-                                                )
-                                criterionsList.append(Criterion(
-                                                                documentID = newDocument,
-                                                                criteriaType = 'field2',
-                                                                criteriaValue = fields[1],
-                                                           )
-                                                )
-                                criterionsList.append(Criterion(
-                                                                documentID = newDocument,
-                                                                criteriaType = 'field3',
-                                                                criteriaValue = fields[2],
-                                                           )
-                                                )
-                                criterionsList.append(Criterion(
-                                                                documentID = newDocument,
-                                                                criteriaType = 'field4',
-                                                                criteriaValue = fields[3],
-                                                           )
-                                                )
-                                criterionsList.append(Criterion(
-                                                                documentID = newDocument,
-                                                                criteriaType = 'field5',
-                                                                criteriaValue = fields[4],
-                                                           )
-                                                )
-                                criterionsList.append(Criterion(
-                                                                documentID = newDocument,
-                                                                criteriaType = 'field6',
-                                                                criteriaValue = fields[5],
-                                                           )
-                                                )
-                                criterionsList.append(Criterion(
-                                                                documentID = newDocument,
-                                                                criteriaType = 'field7',
-                                                                criteriaValue = fields[6],
-                                                           )
-                                                )
-                                criterionsList.append(Criterion(
-                                                                documentID = newDocument,
-                                                                criteriaType = 'field8',
-                                                                criteriaValue = fields[7],
-                                                           )
-                                                )
-                                criterionsList.append(Criterion(
-                                                                documentID = newDocument,
-                                                                criteriaType = 'field9',
-                                                                criteriaValue = fields[8],
+                                                                field1 = fields[1],
+                                                                field2 = fields[2],
+                                                                field3 = fields[3],
+                                                                field4 = fields[4],
+                                                                field5 = fields[5],
+                                                                field6 = fields[6],
+                                                                field7 = fields[7],
+                                                                field8 = fields[8],
+                                                                field9 = fields[9],
                                                            )
                                                 )
                             Criterion.objects.bulk_create(criterionsList)
@@ -201,8 +160,15 @@ class Office(View):
             for eachField in fields:
                 criterionsList.append(Criterion(
                                                 documentID = newDocument,
-                                                criteriaType = eachField,
-                                                criteriaValue = fields[eachField],
+                                                field1 = fields['field1'],
+                                                field2 = fields['field2'],
+                                                field3 = fields['field3'],
+                                                field4 = fields['field4'],
+                                                field5 = fields['field5'],
+                                                field6 = fields['field6'],
+                                                field7 = fields['field7'],
+                                                field8 = fields['field8'],
+                                                field9 = fields['field9'],
                                            )
                                 )
             Criterion.objects.bulk_create(criterionsList)
