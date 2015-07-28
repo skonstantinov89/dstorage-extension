@@ -30,6 +30,8 @@ class Document(models.Model):
     fileID = models.ForeignKey(Files, blank=True, null=True)
     
 class Criterion(models.Model):
+    # Трябва да ни се дадат кои ще са критериите,
+    # Понеже така ще стане много сложно
     documentID = models.ForeignKey(Document)
     criteriaType = models.TextField()
     criteriaValue = models.TextField()
@@ -42,9 +44,10 @@ class Requests(models.Model):
     there will be more documents in one paper protocol.
     status = {
                 in-progress,
-                waiting-to-verify,
                 verified,
                 not-verified,
+                incorrect,
+                not-sended
     }
     '''
     userID = models.ForeignKey(User)

@@ -1,0 +1,97 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+    <div class="jumbotron">
+      <div class="container">
+        <table class="table table-bordered table-hover" id = 'table'>
+        <thead style='text-align: center'>
+            <tr>
+                <th>ИД</th>
+                <th>Индекси</th>
+                <th>Статус</th>
+                <th>Приет в Офис</th>
+                <th>Приет в Централно управление</th>
+                <th>Приет в Склад</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for eachElement in frontData%}
+            <tr align='left'>
+                <td style="vertical-align:middle"> {{eachElement.document.id}} </td>
+                <td style="vertical-align:middle"> 
+                    {% for eachField in eachElement.fields  %}
+                        {{eachField.criteriaType}} : {{eachField.criteriaValue}} </br>
+                    {% endfor %}
+                </td>
+
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.document.status == 'in-warehouse' %}
+                        Наличен
+                    {% elif eachElement.document.status == 'in-courier' %}
+                        В транзит
+                    {% elif eachElement.document.status == 'destroyed' %}
+                        Унищожен
+                    {% elif eachElement.document.status == 'incorrect-input' %}
+                        Неправилно въведен
+                    {% endif %}
+                </td>
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.document.officeStartDate == None %}
+                        ----
+                    {% else %}
+                        {{eachElement.document.officeStartDate}}
+                    {% endif %}
+                </td>
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.document.centralManagementStartDate == None %}
+                        ----
+                    {% else %}
+                        {{eachElement.document.centralManagementStartDate}}
+                    {% endif %}
+                </td>
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.document.archiveStartDate == None %}
+                        ----
+                    {% else %}
+                        {{eachElement.document.archiveStartDate}}
+                    {% endif %}
+                </td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+  </div>
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#table').DataTable({
+        "iDisplayLength": 50,
+        "bLengthChange": false,
+        "autoWidth": true,
+        "bFilter": true,
+        'bSort': true,
+        'language': {
+                        "sProcessing":   "Обработка на резултатите...",
+                        "sLengthMenu":   "Показване на _MENU_ резултата",
+                        "sZeroRecords":  "Няма намерени резултати",
+                        "sInfo":         "Показване на резултати от _START_ до _END_ от общо _TOTAL_",
+                        "sInfoEmpty":    "Показване на резултати от 0 до 0 от общо 0",
+                        "sInfoFiltered": "(филтрирани от общо _MAX_ резултата)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Търсене във всички колони:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Първа",
+                            "sPrevious": "Предишна",
+                            "sNext":     "Следваща",
+                            "sLast":     "Последна"
+                        }
+                    }
+        });
+    });
+    </script>
+
+      </div>
+    </div>
+    {%endblock%}

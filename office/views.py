@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.db.models import Q
 
 from system.models import Document, Requests, Criterion, Files
 from office.forms import DocumentForm
@@ -18,14 +19,58 @@ import datetime, codecs, csv
 
 class Office(View):
     class moveToCentral(View):
-        pass
+        def get(self,request):
+            context = RequestContext(request)
+            return render_to_response('move/search.html',context)
+
+        def post(self, request):
+            context = RequestContext(request)
+            fields = {}
+            for i in range(1,10):
+                fields['field' + str(i)] = request.POST.get('field' + str(i), '')
+
+            criteriaData = Criterion.objects.filter(documentID__status='in-warehouse')
+            # documentData = list(Document.objects.filter(active=True).values_list('id', flat=True))
+            documentData = Document.objects.select_related().filter(active=True)
+            # criteriaData = 
+            for eachField in fields:
+                pass
+                # TODO
+            criteriaData=criteriaData.filter(
+                                                Q(criteriaType = 'field1'), Q(criteriaValue__icontains = fields['field1']) |
+                                                Q(criteriaType = 'field2'), Q(criteriaValue__icontains = fields['field2']) |
+                                                Q(criteriaType = 'field3'), Q(criteriaValue__icontains = fields['field3']) |
+                                                Q(criteriaType = 'field4'), Q(criteriaValue__icontains = fields['field4']) |
+                                                Q(criteriaType = 'field5'), Q(criteriaValue__icontains = fields['field5']) |
+                                                Q(criteriaType = 'field6'), Q(criteriaValue__icontains = fields['field6']) |
+                                                Q(criteriaType = 'field7'), Q(criteriaValue__icontains = fields['field7']) |
+                                                Q(criteriaType = 'field8'), Q(criteriaValue__icontains = fields['field8']) |
+                                                Q(criteriaType = 'field9'), Q(criteriaValue__icontains = fields['field9']),
+                                                Q(documentID__in = documentData)
+                                            )
+
+
+            print (criteriaData)
+            docIDs = criteriaData.values_list('documentID', flat=True).distinct()
+
+            criteriaData = criteriaData.order_by('documentID')
+
+            frontData = []
+            for eachDoc in docIDs:
+                frontData.append({
+                    'document': Document.objects.filter(id=eachDoc),
+                    'fields': criteriaData.filter(documentID=eachDoc)
+                    })
+            return render_to_response('move/list.html', locals(), context)
+
+
 
     class preview(View):
         @method_decorator(login_required)
         def get(self, request):
             context = RequestContext(request)
             frontData = []
-            documentData = Document.objects.all()
+            documentData = Document.objects.filter(active=True)
             for eachDocument in documentData:
                 frontData.append({
                     'document': eachDocument,

@@ -20,6 +20,7 @@ from office.views import Office
 
 urlpatterns = [
     # url(r'home$', ''''),
+    url(r'move-central$',        Office.moveToCentral.as_view(),    name='moveToCentral'),
     url(r'preview$',             Office.preview.as_view(),          name='preview'),
     url(r'create-new$',          Office.createNewDoc.as_view(),     name='createNewDoc'),
     url(r'create-bulk$',         Office.createBulk.as_view(),       name='createBulk'),
