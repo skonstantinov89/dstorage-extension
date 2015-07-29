@@ -46,7 +46,6 @@ class Criterion(models.Model):
 
 class Protocols (models.Model):
     userID = models.ForeignKey(User)
-    verifierID = models.ForeignKey(User, blank=True, null=True)
     requestDate = models.DateField()
     fromLocation = models.TextField()
     toLocation = models.TextField()
@@ -64,6 +63,7 @@ class Requests(models.Model):
                 not-sended      # when we correct the returned documents
     }
     '''
+    verifierID = models.ForeignKey(User, blank=True, null=True)
     documentID = models.ForeignKey(Document)
     protocolID = models.ForeignKey(Protocols)
     status = models.TextField()

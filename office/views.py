@@ -13,12 +13,82 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.db.models import Q
 
-from system.models import Document, Requests, Criterion, Files
+from system.models import Document, Requests, Criterion, Files, Protocols
 from office.forms import DocumentForm
 import datetime, codecs, csv
+# reportlab imports
+
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import cm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.fonts import addMapping
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.platypus import Paragraph
+from reportlab.platypus import Frame, Spacer, Image, Table
+from reportlab.platypus.flowables import KeepInFrame
+from reportlab.platypus.flowables import PageBreak
+from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate
+# from lxml.html.builder import BIG
+pdfmetrics.registerFont(TTFont('n',       'FreeSans.ttf'))
+pdfmetrics.registerFont(TTFont('i',       'FreeSansOblique.ttf'))
+pdfmetrics.registerFont(TTFont('b',       'FreeSansBold.ttf'))
+pdfmetrics.registerFont(TTFont('bi',      'FreeSansBoldOblique.ttf'))
+# pdfmetrics.registerFont(TTFont('bullet',  'opens___.ttf'))
+pdfmetrics.registerFont(TTFont('barcode', 'code128.TTF'))
+addMapping('n', 0, 0, 'n')
+addMapping('n', 0, 1, 'i')
+addMapping('n', 1, 0, 'b')
+addMapping('n', 1, 1, 'bi')
+styleNormal = ParagraphStyle(name = 'normal', alignment=TA_JUSTIFY, fontName='n', fontSize = 10, \
+                             leading = 14)
+styleCenter = ParagraphStyle(name = 'normal', alignment=TA_CENTER, fontName='n', fontSize = 10, \
+                             leading = 14)
+styleBold = ParagraphStyle(name = 'normal', alignment=TA_LEFT, fontName='b', fontSize = 12, \
+                             leading = 14)
+styleBoldCenter = ParagraphStyle(name = 'normal', alignment=TA_CENTER, fontName='b', fontSize = 12, \
+                             leading = 12*1.2)
+styleRight = ParagraphStyle(name = 'normal', alignment=TA_RIGHT, fontName='n', fontSize = 12, \
+                             leading = 14)
+styleNormalFLIspace = ParagraphStyle(name = 'normal', alignment=TA_JUSTIFY, fontName='n', fontSize = 12, \
+                             leading = 14, firstLineIndent=0.5*cm, spaceBefore = 0.7*cm, spaceAfter = 1*cm)
+styleDA = ParagraphStyle(name = 'normal', alignment=TA_LEFT, fontName='b', fontSize = 12, \
+                             leading = 14)
+styleDAcenter = ParagraphStyle(name = 'normal', alignment=TA_CENTER, fontName='b', fontSize = 12, \
+                             leading = 14)
+styleDAbarcode = ParagraphStyle(name = 'normal', alignment=TA_CENTER, fontName='barcode', fontSize = 30, \
+                             leading = 28)
+styleBullet = ParagraphStyle(name = 'normal', alignment=TA_JUSTIFY, fontName='n', fontSize = 30, \
+                             leading = 28, bulletFontName = 'bullet', bulletFontSize = 12, \
+                             bulletIndent = 2*cm, leftIndent = 2.5*cm, spaceAfter = 8)
+styleStrangeBullet = ParagraphStyle(name = 'normal', alignment=TA_JUSTIFY, fontName='n', fontSize = 30, \
+                             leading = 28, bulletFontName = 'n', bulletFontSize = 12, \
+                             bulletIndent = 2*cm, leftIndent = 2.5*cm, spaceAfter = 8)
+
+# reportlab frame measurements - left margin, bottom margin, width, [first page height, other pages height]
+mflm, mfbm, mfw, mfh = 1, 0.7, 19, [28, 28]
+
+
+#end reportlab imports
+
+
 
 class Office(View):
     class moveToCentral(View):
+        class RequestTemplate(SimpleDocTemplate):
+            def addPageTemplates(self,pageTemplates):
+                """
+                fix up the one and only Frame
+                """
+                if pageTemplates:
+                    f = pageTemplates[0].frames[0]
+                    f._leftPadding=f._rightPadding=f._topPadding=f._bottomPadding=0
+                    f._geom()
+                SimpleDocTemplate.addPageTemplates(self,pageTemplates)      
+
         def get(self,request):
             context = RequestContext(request)
             return render_to_response('move/search.html',context)
@@ -31,8 +101,8 @@ class Office(View):
 
             # documentData = list(Document.objects.filter(active=True).values_list('id', flat=True))
             # criteriaData = 
-            searchButton = request.POST.get('searchButton', False)
-            if searchButton:
+            searchButton = request.POST.get('searchButton', '')
+            if searchButton != '':
                 criteriaData=Criterion.objects.select_related().filter(
                                                                         Q(field1__icontains = fields['field1']),
                                                                         Q(field2__icontains = fields['field2']),
@@ -48,8 +118,9 @@ class Office(View):
 
                 return render_to_response('move/list.html', locals(), context)
             else:
-                centralDocuments = request.POST.get('centralDocuments', '')
-                archiveDocuments = request.POST.get('archiveDocuments', '')
+                centralDocuments = request.POST.get('centralDocuments', '').split(',')
+                archiveDocuments = request.POST.get('archiveDocuments', '').split(',')
+
                 requestList = []
                 protocolList = []
                 if centralDocuments:
@@ -66,17 +137,15 @@ class Office(View):
                                                         protocolID = newProtocol
                                                    )
                                             )
+                        currentDocument = Document.objects.get(id=int(eachDocument))
+                        currentDocument.status = 'in-courier'
+                        currentDocument.save()
+                        
                     Requests.objects.bulk_create(requestList)
-                    for eachRequest in requestList:
-                        protocolList.append(Protocols(
-                                                        requestID = eachRequest
-                                                    )
-                                            )
-                    Protocols.objects.bulk_create(protocolList)
 
 
                     response = HttpResponse(content_type='application/pdf')
-                    response['Content-Disposition'] = 'attachment; filename="Protocol-' + barCode +'.pdf"'
+                    response['Content-Disposition'] = 'attachment; filename="Protocol-' + str(datetime.datetime.now()) +'.pdf"'
                     boxstyle = [
                                     ('ALIGN',         (0,0), (-1,0), 'CENTER'),
                                     ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
@@ -87,8 +156,11 @@ class Office(View):
                                     ('FONT',          (0,0), (-1,0),  'b', 10),
                                     ('FONT',          (0,1), (-1,-1),  'n', 10),
                                 ]
+                    boxText =   [
+                            [u'Архивна Единица', u'Забележка']
+                        ]
 
-                    boxCols = [5*cm,12*cm]
+                    boxCols = [12*cm, 5*cm]
                     signBoxCols = [6*cm,3*cm,6*cm]
                     signBoxStyle = [
                                     ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
@@ -96,30 +168,39 @@ class Office(View):
                                     ('FONT',          (0,0), (-1,-1),  'n', 10)
                                     ]
 
-                    requestObject.status = 'in-rogress'
-                    requestObject.userID = request.user
-                    requestObject.DoneDate = datetime.datetime.now()
-                    requestObject.save()
-                    boxText =   [
-                                    [u'Проект', u'Архивна Единица']
-                                ]
-                    requestCode = requestObject.id
-                    requestDate = requestObject.RequestDate
-                    criteriaData = criteria.objects.filter(archiveUnitID=requestObject.archiveUnitID)
                     criteriaFront = ''
-                    for eachCriterion in criteriaData:
-                        criteriaFront += eachCriterion.criteriaTypeID.name + ': ' + eachCriterion.value + '<br/>'
-                    barCode =  str('R') + str(requestObject.id).zfill(7)
+                    for eachRequest in requestList:
+                        criterionObject = Criterion.objects.get(documentID = eachRequest.documentID)
+                        # boxText.append([
+                        #     # ['Индекс 1: ' + criterionObject.field1 + '<br/>', ''],
+                        #     # ['Индекс 2: ' + criterionObject.field2 + '<br/>', ''],
+                        #     # ['Индекс 3: ' + criterionObject.field3 + '<br/>', ''],
+                        #     # ['Индекс 4: ' + criterionObject.field4 + '<br/>', ''],
+                        #     # ['Индекс 5: ' + criterionObject.field5 + '<br/>', ''],
+                        #     # ['Индекс 6: ' + criterionObject.field6 + '<br/>', ''],
+                        #     # ['Индекс 7: ' + criterionObject.field7 + '<br/>', ''],
+                        #     # ['Индекс 8: ' + criterionObject.field8 + '<br/>', ''],
+                        #     # ['Индекс 9: ' + criterionObject.field9 + '<br/>', ''],
+                        #     ['hello', '']
+                        #     ])
+                        criteriaFront += 'Индекс 1: ' + criterionObject.field1 + '<br/>'
+                        criteriaFront += 'Индекс 2: ' + criterionObject.field2 + '<br/>'
+                        criteriaFront += 'Индекс 3: ' + criterionObject.field3 + '<br/>'
+                        criteriaFront += 'Индекс 4: ' + criterionObject.field4 + '<br/>'
+                        criteriaFront += 'Индекс 5: ' + criterionObject.field5 + '<br/>'
+                        criteriaFront += 'Индекс 6: ' + criterionObject.field6 + '<br/>'
+                        criteriaFront += 'Индекс 7: ' + criterionObject.field7 + '<br/>'
+                        criteriaFront += 'Индекс 8: ' + criterionObject.field8 + '<br/>'
+                        criteriaFront += 'Индекс 9: ' + criterionObject.field9 + '<br/>'
 
-                    userObject = User.objects.get(id=requestObject.userID.id)
                     header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
-                    ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ  (%s) </strong>'''%(barCode),styleBoldCenter)
+                    ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ КЪМ ЦЕНТРАЛНО УПРАВЛЕНИЕ (%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
                     textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на ДСК предаде
                     на …............................................................, представител на ДСК следната архивна единица:
-                        '''%(requestObject.clientName),styleNormal)
+                        ''',styleNormal)
                     boxText.append([
-                        Paragraph(requestObject.projectName,styleCenter),
-                        Paragraph(criteriaFront,styleCenter)
+                        Paragraph(criteriaFront,styleCenter),
+                        ''
                         ])
                     textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
                         ''', styleNormal)
@@ -133,42 +214,52 @@ class Office(View):
                         [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
 
                     ]
-                    RequestBarcode = createBarcodeDrawing('Code128', value=barCode, humanReadable=1)
-                    cfs=[Spacer(0, 0.5*cm),
-                        RequestBarcode,
-                        Spacer(0, 0.5*cm),
+                    cfs=[Spacer(0, 0.3*cm),
                         header,
-                        Spacer(0, 0.5*cm),
+                        Spacer(0, 0.3*cm),
                         textBeforeTable,
-                        Spacer(0, 0.5*cm),
+                        Spacer(0, 0.3*cm),
                         Table(boxText, style=boxstyle, colWidths=boxCols),
-                        Spacer(0, 0.5*cm),
+                        Spacer(0, 0.3*cm),
                         textUnderTable,
-                        Spacer(0, 0.5*cm),
+                        Spacer(0, 0.3*cm),
                         Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
-                        Spacer(0, 0.7*cm),
+                        Spacer(0, 0.5*cm),
                         Paragraph(u'________________________________________________________________________________' , styleNormal),
-                        Spacer(0, 0.5*cm),
-                        RequestBarcode,
-                        Spacer(0, 0.5*cm),
+                        Spacer(0, 0.3*cm),
                         header,
-                        Spacer(0, 0.5*cm),
+                        Spacer(0, 0.3*cm),
                         textBeforeTable,
-                        Spacer(0, 0.5*cm),
+                        Spacer(0, 0.3*cm),
                         Table(boxText, style=boxstyle, colWidths=boxCols),
-                        Spacer(0, 0.5*cm),
+                        Spacer(0, 0.3*cm),
                         textUnderTable,
-                        Spacer(0, 0.5*cm),
+                        Spacer(0, 0.3*cm),
                         Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
-                        Spacer(0, 0.7*cm),
+                        Spacer(0, 0.3*cm),
                          ]
-                    RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
+                    self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
                     return response
 
+                elif archiveDocuments:
+                    newProtocol = Protocols.objects.create(
+                                                userID = request.user,
+                                                requestDate = datetime.datetime.now(),
+                                                fromLocation = 'storage 1', # office
+                                                toLocation = 'storage 2', # central
+                                            )
+                    for eachDocument in centralDocuments:
+                        requestList.append(Requests(
+                                                        documentID = Document.objects.get(id=int(eachDocument)),
+                                                        status = 'in-progress',
+                                                        protocolID = newProtocol
+                                                   )
+                                            )
+                    Requests.objects.bulk_create(requestList)
 
-                    if archiveDocuments:
+
                     response = HttpResponse(content_type='application/pdf')
-                    response['Content-Disposition'] = 'attachment; filename="Protocol-' + datetime.datetime.now() +'.pdf"'
+                    response['Content-Disposition'] = 'attachment; filename="Protocol-' + str(datetime.datetime.now()) +'.pdf"'
                     boxstyle = [
                                     ('ALIGN',         (0,0), (-1,0), 'CENTER'),
                                     ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
@@ -179,8 +270,11 @@ class Office(View):
                                     ('FONT',          (0,0), (-1,0),  'b', 10),
                                     ('FONT',          (0,1), (-1,-1),  'n', 10),
                                 ]
+                    boxText =   [
+                            [u'Архивна Единица', u'Забележка']
+                        ]
 
-                    boxCols = [5*cm,12*cm]
+                    boxCols = [12*cm, 5*cm]
                     signBoxCols = [6*cm,3*cm,6*cm]
                     signBoxStyle = [
                                     ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
@@ -188,30 +282,27 @@ class Office(View):
                                     ('FONT',          (0,0), (-1,-1),  'n', 10)
                                     ]
 
-                    requestObject.status = 'waiting-return-courier'
-                    requestObject.operatorStartID = request.user
-                    requestObject.DoneDate = datetime.datetime.now()
-                    requestObject.save()
-                    boxText =   [
-                                    [u'Проект', u'Архивна Единица']
-                                ]
-                    requestCode = requestObject.id
-                    requestDate = requestObject.RequestDate
-                    criteriaData = criteria.objects.filter(archiveUnitID=requestObject.archiveUnitID)
                     criteriaFront = ''
-                    for eachCriterion in criteriaData:
-                        criteriaFront += eachCriterion.criteriaTypeID.name + ': ' + eachCriterion.value + '<br/>'
-                    barCode =  str('R') + str(requestObject.id).zfill(7)
+                    for eachRequest in requestList:
+                        criterionObject = Criterion.objects.get(documentID = eachRequest.documentID)
+                        criteriaFront += 'Индекс 1: ' + criterionObject.field1 + '<br/>'
+                        criteriaFront += 'Индекс 2: ' + criterionObject.field2 + '<br/>'
+                        criteriaFront += 'Индекс 3: ' + criterionObject.field3 + '<br/>'
+                        criteriaFront += 'Индекс 4: ' + criterionObject.field4 + '<br/>'
+                        criteriaFront += 'Индекс 5: ' + criterionObject.field5 + '<br/>'
+                        criteriaFront += 'Индекс 6: ' + criterionObject.field6 + '<br/>'
+                        criteriaFront += 'Индекс 7: ' + criterionObject.field7 + '<br/>'
+                        criteriaFront += 'Индекс 8: ' + criterionObject.field8 + '<br/>'
+                        criteriaFront += 'Индекс 9: ' + criterionObject.field9 + '<br/>'
 
-                    userObject = User.objects.get(id=requestObject.userID.id)
                     header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
-                    ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ  (%s) </strong>'''%(barCode),styleBoldCenter)
-                    textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на %s предаде
+                    ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ КЪМ АРХИВ (%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
+                    textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на ДСК предаде
                     на …............................................................, представител на ДСК следната архивна единица:
-                        '''%(requestObject.clientName),styleNormal)
+                        ''',styleNormal)
                     boxText.append([
-                        Paragraph(requestObject.projectName,styleCenter),
-                        Paragraph(criteriaFront,styleCenter)
+                        Paragraph(criteriaFront,styleCenter),
+                        ''
                         ])
                     textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
                         ''', styleNormal)
@@ -225,10 +316,7 @@ class Office(View):
                         [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
 
                     ]
-                    RequestBarcode = createBarcodeDrawing('Code128', value=barCode, humanReadable=1)
                     cfs=[Spacer(0, 0.5*cm),
-                        RequestBarcode,
-                        Spacer(0, 0.5*cm),
                         header,
                         Spacer(0, 0.5*cm),
                         textBeforeTable,
@@ -241,8 +329,6 @@ class Office(View):
                         Spacer(0, 0.7*cm),
                         Paragraph(u'________________________________________________________________________________' , styleNormal),
                         Spacer(0, 0.5*cm),
-                        RequestBarcode,
-                        Spacer(0, 0.5*cm),
                         header,
                         Spacer(0, 0.5*cm),
                         textBeforeTable,
@@ -254,9 +340,8 @@ class Office(View):
                         Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
                         Spacer(0, 0.7*cm),
                          ]
-                    RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
+                    self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
                     return response
-
 
 
 

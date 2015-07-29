@@ -10,8 +10,7 @@
                 <th>ИД</th>
                 <th>Индекси</th>
                 <th>Статус</th>
-                <th>Премести в ЦУ</th>
-                <th>Премести в Склад</th>
+                <th>Операции</th>
             </tr>
         </thead>
         <tbody>
@@ -43,19 +42,14 @@
                 </td>
                 <td style="vertical-align:middle"> 
             <div id='move_to_central'>
-                    <button class='btn btn-success btn-block add_to_central' value='{{eachElement.documentID.id}}'>Добави в списък за ЦУ</button>
-            </div>
-                </td>
-                <td style="vertical-align:middle"> 
-
-                <div id='move_to_archive'>
-                <button class='btn btn-success btn-block add_to_archive' value='{{eachElement.documentID.id}}'>
+                <button class='btn btn-success btn-block add_to_central' value='{{eachElement.documentID.id}}'>Добави в списък за ЦУ</button>
+                <button class='btn btn-primary btn-block add_to_archive' value='{{eachElement.documentID.id}}'>
                     Добави в списък за архив
                 </button>
+            </div>  
 
-
-                </div>
                 </td>
+
             </tr>
             {%endif%}
             {%endfor%}
@@ -152,7 +146,7 @@
         if (index > -1){
             archiveArrayID.splice(index, 1);
         }
-        $(this).replaceWith("<button class='btn btn-success btn-block add_to_archive' value="+ value +"> Добави в списък за архив </button>");
+        $(this).replaceWith("<button class='btn btn-primary btn-block add_to_archive' value="+ value +"> Добави в списък за архив </button>");
 
         $('#archiveDocuments').prop('value', archiveArrayID);
     });
