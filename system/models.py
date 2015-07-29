@@ -44,25 +44,29 @@ class Criterion(models.Model):
     field9 = models.TextField(blank=True, null=True)
 
 
+class Protocols (models.Model):
+    userID = models.ForeignKey(User)
+    verifierID = models.ForeignKey(User, blank=True, null=True)
+    requestDate = models.DateField()
+    fromLocation = models.TextField()
+    toLocation = models.TextField()
+    
 class Requests(models.Model):
     '''
     protocolID has to be the autoincrement 
     for every new bundle of requests, so 
     there will be more documents in one paper protocol.
     status = {
-                in-progress,
-                verified,
-                not-verified,
-                incorrect,
-                not-sended
+                in-progress,    # when we send it from office
+                verified,       # when its verified at central
+                not-verified,   # when its not verified at central
+                incorrect,      # when we correct the returned documents
+                not-sended      # when we correct the returned documents
     }
     '''
-    userID = models.ForeignKey(User)
     documentID = models.ForeignKey(Document)
-    requestDate = models.DateField()
+    protocolID = models.ForeignKey(Protocols)
     status = models.TextField()
-    fromLocation = models.TextField()
-    toLocation = models.TextField()
-    protocolID = models.IntegerField()
+
 
 

@@ -31,20 +31,232 @@ class Office(View):
 
             # documentData = list(Document.objects.filter(active=True).values_list('id', flat=True))
             # criteriaData = 
-            criteriaData=Criterion.objects.select_related().filter(
-                                                                    Q(field1__icontains = fields['field1']),
-                                                                    Q(field2__icontains = fields['field2']),
-                                                                    Q(field3__icontains = fields['field3']),
-                                                                    Q(field4__icontains = fields['field4']),
-                                                                    Q(field5__icontains = fields['field5']),
-                                                                    Q(field6__icontains = fields['field6']),
-                                                                    Q(field7__icontains = fields['field7']),
-                                                                    Q(field8__icontains = fields['field8']),
-                                                                    Q(field9__icontains = fields['field9']),
-                                                                    Q(documentID__status='in-warehouse')
-                                                                )
+            searchButton = request.POST.get('searchButton', False)
+            if searchButton:
+                criteriaData=Criterion.objects.select_related().filter(
+                                                                        Q(field1__icontains = fields['field1']),
+                                                                        Q(field2__icontains = fields['field2']),
+                                                                        Q(field3__icontains = fields['field3']),
+                                                                        Q(field4__icontains = fields['field4']),
+                                                                        Q(field5__icontains = fields['field5']),
+                                                                        Q(field6__icontains = fields['field6']),
+                                                                        Q(field7__icontains = fields['field7']),
+                                                                        Q(field8__icontains = fields['field8']),
+                                                                        Q(field9__icontains = fields['field9']),
+                                                                        Q(documentID__status='in-warehouse')
+                                                                    )
 
-            return render_to_response('move/list.html', locals(), context)
+                return render_to_response('move/list.html', locals(), context)
+            else:
+                centralDocuments = request.POST.get('centralDocuments', '')
+                archiveDocuments = request.POST.get('archiveDocuments', '')
+                requestList = []
+                protocolList = []
+                if centralDocuments:
+                    newProtocol = Protocols.objects.create(
+                                                userID = request.user,
+                                                requestDate = datetime.datetime.now(),
+                                                fromLocation = 'storage 1', # office
+                                                toLocation = 'storage 2', # central
+                                            )
+                    for eachDocument in centralDocuments:
+                        requestList.append(Requests(
+                                                        documentID = Document.objects.get(id=int(eachDocument)),
+                                                        status = 'in-progress',
+                                                        protocolID = newProtocol
+                                                   )
+                                            )
+                    Requests.objects.bulk_create(requestList)
+                    for eachRequest in requestList:
+                        protocolList.append(Protocols(
+                                                        requestID = eachRequest
+                                                    )
+                                            )
+                    Protocols.objects.bulk_create(protocolList)
+
+
+                    response = HttpResponse(content_type='application/pdf')
+                    response['Content-Disposition'] = 'attachment; filename="Protocol-' + barCode +'.pdf"'
+                    boxstyle = [
+                                    ('ALIGN',         (0,0), (-1,0), 'CENTER'),
+                                    ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
+                                    ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                    ('TOPPADDING',    (0,0), (-1,-1), 1),
+                                    ('LEFTPADDING',   (0,0), (-1,-1), 10),
+                                    ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
+                                    ('FONT',          (0,0), (-1,0),  'b', 10),
+                                    ('FONT',          (0,1), (-1,-1),  'n', 10),
+                                ]
+
+                    boxCols = [5*cm,12*cm]
+                    signBoxCols = [6*cm,3*cm,6*cm]
+                    signBoxStyle = [
+                                    ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
+                                    ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                    ('FONT',          (0,0), (-1,-1),  'n', 10)
+                                    ]
+
+                    requestObject.status = 'in-rogress'
+                    requestObject.userID = request.user
+                    requestObject.DoneDate = datetime.datetime.now()
+                    requestObject.save()
+                    boxText =   [
+                                    [u'Проект', u'Архивна Единица']
+                                ]
+                    requestCode = requestObject.id
+                    requestDate = requestObject.RequestDate
+                    criteriaData = criteria.objects.filter(archiveUnitID=requestObject.archiveUnitID)
+                    criteriaFront = ''
+                    for eachCriterion in criteriaData:
+                        criteriaFront += eachCriterion.criteriaTypeID.name + ': ' + eachCriterion.value + '<br/>'
+                    barCode =  str('R') + str(requestObject.id).zfill(7)
+
+                    userObject = User.objects.get(id=requestObject.userID.id)
+                    header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
+                    ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ  (%s) </strong>'''%(barCode),styleBoldCenter)
+                    textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на ДСК предаде
+                    на …............................................................, представител на ДСК следната архивна единица:
+                        '''%(requestObject.clientName),styleNormal)
+                    boxText.append([
+                        Paragraph(requestObject.projectName,styleCenter),
+                        Paragraph(criteriaFront,styleCenter)
+                        ])
+                    textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
+                        ''', styleNormal)
+                    signBox = [
+
+                        [u'Дата: ' + datetime.datetime.now().strftime("%d.%m.%Y")+u'г.', u'', u''],
+                        [u'', u''],
+
+                        [u'ПРИЕЛ: ....................................',  u'',  u'ПРЕДАЛ: .....................................'],
+
+                        [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
+
+                    ]
+                    RequestBarcode = createBarcodeDrawing('Code128', value=barCode, humanReadable=1)
+                    cfs=[Spacer(0, 0.5*cm),
+                        RequestBarcode,
+                        Spacer(0, 0.5*cm),
+                        header,
+                        Spacer(0, 0.5*cm),
+                        textBeforeTable,
+                        Spacer(0, 0.5*cm),
+                        Table(boxText, style=boxstyle, colWidths=boxCols),
+                        Spacer(0, 0.5*cm),
+                        textUnderTable,
+                        Spacer(0, 0.5*cm),
+                        Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                        Spacer(0, 0.7*cm),
+                        Paragraph(u'________________________________________________________________________________' , styleNormal),
+                        Spacer(0, 0.5*cm),
+                        RequestBarcode,
+                        Spacer(0, 0.5*cm),
+                        header,
+                        Spacer(0, 0.5*cm),
+                        textBeforeTable,
+                        Spacer(0, 0.5*cm),
+                        Table(boxText, style=boxstyle, colWidths=boxCols),
+                        Spacer(0, 0.5*cm),
+                        textUnderTable,
+                        Spacer(0, 0.5*cm),
+                        Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                        Spacer(0, 0.7*cm),
+                         ]
+                    RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
+                    return response
+
+
+                    if archiveDocuments:
+                    response = HttpResponse(content_type='application/pdf')
+                    response['Content-Disposition'] = 'attachment; filename="Protocol-' + datetime.datetime.now() +'.pdf"'
+                    boxstyle = [
+                                    ('ALIGN',         (0,0), (-1,0), 'CENTER'),
+                                    ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
+                                    ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                    ('TOPPADDING',    (0,0), (-1,-1), 1),
+                                    ('LEFTPADDING',   (0,0), (-1,-1), 10),
+                                    ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
+                                    ('FONT',          (0,0), (-1,0),  'b', 10),
+                                    ('FONT',          (0,1), (-1,-1),  'n', 10),
+                                ]
+
+                    boxCols = [5*cm,12*cm]
+                    signBoxCols = [6*cm,3*cm,6*cm]
+                    signBoxStyle = [
+                                    ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
+                                    ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                    ('FONT',          (0,0), (-1,-1),  'n', 10)
+                                    ]
+
+                    requestObject.status = 'waiting-return-courier'
+                    requestObject.operatorStartID = request.user
+                    requestObject.DoneDate = datetime.datetime.now()
+                    requestObject.save()
+                    boxText =   [
+                                    [u'Проект', u'Архивна Единица']
+                                ]
+                    requestCode = requestObject.id
+                    requestDate = requestObject.RequestDate
+                    criteriaData = criteria.objects.filter(archiveUnitID=requestObject.archiveUnitID)
+                    criteriaFront = ''
+                    for eachCriterion in criteriaData:
+                        criteriaFront += eachCriterion.criteriaTypeID.name + ': ' + eachCriterion.value + '<br/>'
+                    barCode =  str('R') + str(requestObject.id).zfill(7)
+
+                    userObject = User.objects.get(id=requestObject.userID.id)
+                    header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
+                    ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ  (%s) </strong>'''%(barCode),styleBoldCenter)
+                    textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на %s предаде
+                    на …............................................................, представител на ДСК следната архивна единица:
+                        '''%(requestObject.clientName),styleNormal)
+                    boxText.append([
+                        Paragraph(requestObject.projectName,styleCenter),
+                        Paragraph(criteriaFront,styleCenter)
+                        ])
+                    textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
+                        ''', styleNormal)
+                    signBox = [
+
+                        [u'Дата: ' + datetime.datetime.now().strftime("%d.%m.%Y")+u'г.', u'', u''],
+                        [u'', u''],
+
+                        [u'ПРИЕЛ: ....................................',  u'',  u'ПРЕДАЛ: .....................................'],
+
+                        [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
+
+                    ]
+                    RequestBarcode = createBarcodeDrawing('Code128', value=barCode, humanReadable=1)
+                    cfs=[Spacer(0, 0.5*cm),
+                        RequestBarcode,
+                        Spacer(0, 0.5*cm),
+                        header,
+                        Spacer(0, 0.5*cm),
+                        textBeforeTable,
+                        Spacer(0, 0.5*cm),
+                        Table(boxText, style=boxstyle, colWidths=boxCols),
+                        Spacer(0, 0.5*cm),
+                        textUnderTable,
+                        Spacer(0, 0.5*cm),
+                        Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                        Spacer(0, 0.7*cm),
+                        Paragraph(u'________________________________________________________________________________' , styleNormal),
+                        Spacer(0, 0.5*cm),
+                        RequestBarcode,
+                        Spacer(0, 0.5*cm),
+                        header,
+                        Spacer(0, 0.5*cm),
+                        textBeforeTable,
+                        Spacer(0, 0.5*cm),
+                        Table(boxText, style=boxstyle, colWidths=boxCols),
+                        Spacer(0, 0.5*cm),
+                        textUnderTable,
+                        Spacer(0, 0.5*cm),
+                        Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                        Spacer(0, 0.7*cm),
+                         ]
+                    RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
+                    return response
+
 
 
 

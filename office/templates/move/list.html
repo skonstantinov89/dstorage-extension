@@ -43,12 +43,16 @@
                 </td>
                 <td style="vertical-align:middle"> 
             <div id='move_to_central'>
-                    <button class='btn btn-success btn-block add_to_list' value='{{eachElement.documentID.id}}'>Добави в списък</button>
+                    <button class='btn btn-success btn-block add_to_central' value='{{eachElement.documentID.id}}'>Добави в списък за ЦУ</button>
             </div>
                 </td>
                 <td style="vertical-align:middle"> 
+
                 <div id='move_to_archive'>
-                    
+                <button class='btn btn-success btn-block add_to_archive' value='{{eachElement.documentID.id}}'>
+                    Добави в списък за архив
+                </button>
+
 
                 </div>
                 </td>
@@ -57,13 +61,22 @@
             {%endfor%}
         </tbody>
     </table>
-    <div align='center'>
-        <form method='post' id='submit_to_central'> 
+    <div class='col-md-offset-4' align='left'>
+        <form method='post' id='submit_to_move'> 
         {% csrf_token %}
             <label>
-              Списък с документи за изпращане:
-            <input type='text' name='documentIDs' id='documents' />
+              Списък с документи за изпращане за централно управление:
+            <input type='text' class='form-control'name='centralDocuments' id='centralDocuments' />
         </label>
+        </br>
+            <label>
+              Списък с документи за изпращане за архив:
+            <input type='text' class='form-control' name='archiveDocuments' id='archiveDocuments' />
+        </label>
+        </br>
+        <div class='col-md-7'>
+            <button type='submit' class='btn btn-primary btn-block' id='submit'> Потвърди </button>
+        </div>
     </form>
     </div>
 
@@ -72,7 +85,8 @@
 
 
     <script type="text/javascript">
-    var ArrayID = new Array()
+    var centralArrayID = new Array()
+    var archiveArrayID = new Array()
 
     $(document).ready(function(){
         $('#table').DataTable({
@@ -102,16 +116,59 @@
         });
     });
 
-
-    $('.add_to_list').click(function(){
+    $(document).on('click','.add_to_central',function(){
         var value= $(this).val();
-        ArrayID.push(value)
+        centralArrayID.push(value);
 
-        $(this).replaceWith("<button class='btn btn-block disabled' name='confirmButton' id='confirmButton' disabled> Потвърди </button>")
+        $(this).replaceWith("<button class='btn btn-block btn-warning cancel-central' value="+ value +"> Откажи </button>");
 
-        $('#documents').prop('value', ArrayID)
+        $('#centralDocuments').prop('value', centralArrayID);
+    });
+    $(document).on('click','.add_to_archive', function(){
+        var value= $(this).val();
+        archiveArrayID.push(value);
+
+        $(this).replaceWith("<button class='btn btn-block btn-warning cancel-archive' value="+ value +"> Откажи </button>");
+
+        $('#archiveDocuments').prop('value', archiveArrayID);
+    });
+
+    $(document).on('click','.cancel-central',function(){
+        
+        var value = $(this).val();
+        var index = centralArrayID.indexOf(value);
+        if (index > -1){
+            centralArrayID.splice(index, 1);
+        }
+        $(this).replaceWith("<button class='btn btn-success btn-block add_to_central' value="+ value +"> Добави в списък за ЦУ </button>");
+
+        $('#centralDocuments').prop('value', centralArrayID);
 
     });
+    $(document).on('click','.cancel-archive',function(){
+        
+        var value = $(this).val();
+        var index = archiveArrayID.indexOf(value);
+        if (index > -1){
+            archiveArrayID.splice(index, 1);
+        }
+        $(this).replaceWith("<button class='btn btn-success btn-block add_to_archive' value="+ value +"> Добави в списък за архив </button>");
+
+        $('#archiveDocuments').prop('value', archiveArrayID);
+    });
+    $(document).on('click','#submit', function(event){
+        var centralValue = $('#centralDocuments').val();
+        var archiveValue = $('#archiveDocuments').val();
+
+        if (centralValue.length > 0 || archiveValue.length > 0){
+            $('#submit_to_move').submit();
+        }
+        else{
+            event.preventDefault();
+            alert('Не сте избрали документи за предаване!');
+        }
+    });
+
     </script>
 
       </div>
