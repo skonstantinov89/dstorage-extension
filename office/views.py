@@ -29,38 +29,21 @@ class Office(View):
             for i in range(1,10):
                 fields['field' + str(i)] = request.POST.get('field' + str(i), '')
 
-            criteriaData = Criterion.objects.filter(documentID__status='in-warehouse')
             # documentData = list(Document.objects.filter(active=True).values_list('id', flat=True))
-            documentData = Document.objects.select_related().filter(active=True)
             # criteriaData = 
-            for eachField in fields:
-                pass
-                # TODO
-            criteriaData=criteriaData.filter(
-                                                Q(criteriaType = 'field1'), Q(criteriaValue__icontains = fields['field1']) |
-                                                Q(criteriaType = 'field2'), Q(criteriaValue__icontains = fields['field2']) |
-                                                Q(criteriaType = 'field3'), Q(criteriaValue__icontains = fields['field3']) |
-                                                Q(criteriaType = 'field4'), Q(criteriaValue__icontains = fields['field4']) |
-                                                Q(criteriaType = 'field5'), Q(criteriaValue__icontains = fields['field5']) |
-                                                Q(criteriaType = 'field6'), Q(criteriaValue__icontains = fields['field6']) |
-                                                Q(criteriaType = 'field7'), Q(criteriaValue__icontains = fields['field7']) |
-                                                Q(criteriaType = 'field8'), Q(criteriaValue__icontains = fields['field8']) |
-                                                Q(criteriaType = 'field9'), Q(criteriaValue__icontains = fields['field9']),
-                                                Q(documentID__in = documentData)
-                                            )
+            criteriaData=Criterion.objects.select_related().filter(
+                                                                    Q(field1__icontains = fields['field1']),
+                                                                    Q(field2__icontains = fields['field2']),
+                                                                    Q(field3__icontains = fields['field3']),
+                                                                    Q(field4__icontains = fields['field4']),
+                                                                    Q(field5__icontains = fields['field5']),
+                                                                    Q(field6__icontains = fields['field6']),
+                                                                    Q(field7__icontains = fields['field7']),
+                                                                    Q(field8__icontains = fields['field8']),
+                                                                    Q(field9__icontains = fields['field9']),
+                                                                    Q(documentID__status='in-warehouse')
+                                                                )
 
-
-            print (criteriaData)
-            docIDs = criteriaData.values_list('documentID', flat=True).distinct()
-
-            criteriaData = criteriaData.order_by('documentID')
-
-            frontData = []
-            for eachDoc in docIDs:
-                frontData.append({
-                    'document': Document.objects.filter(id=eachDoc),
-                    'fields': criteriaData.filter(documentID=eachDoc)
-                    })
             return render_to_response('move/list.html', locals(), context)
 
 
@@ -74,7 +57,7 @@ class Office(View):
             for eachDocument in documentData:
                 frontData.append({
                     'document': eachDocument,
-                    'fields': Criterion.objects.filter(documentID = eachDocument.id),
+                    'fields': Criterion.objects.get(documentID = eachDocument.id),
                     })
             return render_to_response('preview/preview.html', locals(), context)
 
@@ -121,15 +104,15 @@ class Office(View):
                                       )
                                 criterionsList.append(Criterion(
                                                                 documentID = newDocument,
-                                                                field1 = fields[1],
-                                                                field2 = fields[2],
-                                                                field3 = fields[3],
-                                                                field4 = fields[4],
-                                                                field5 = fields[5],
-                                                                field6 = fields[6],
-                                                                field7 = fields[7],
-                                                                field8 = fields[8],
-                                                                field9 = fields[9],
+                                                                field1 = fields[0],
+                                                                field2 = fields[1],
+                                                                field3 = fields[2],
+                                                                field4 = fields[3],
+                                                                field5 = fields[4],
+                                                                field6 = fields[5],
+                                                                field7 = fields[6],
+                                                                field8 = fields[7],
+                                                                field9 = fields[8],
                                                            )
                                                 )
                             Criterion.objects.bulk_create(criterionsList)
