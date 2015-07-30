@@ -75,7 +75,6 @@ mflm, mfbm, mfw, mfh = 1, 0.7, 19, [28, 28]
 #end reportlab imports
 
 
-
 class Office(View):
     class moveToCentral(View):
         class RequestTemplate(SimpleDocTemplate):
@@ -131,115 +130,116 @@ class Office(View):
                                                 toLocation = 'storage 2', # central
                                             )
                     for eachDocument in centralDocuments:
-                        requestList.append(Requests(
-                                                        documentID = Document.objects.get(id=int(eachDocument)),
-                                                        status = 'in-progress',
-                                                        protocolID = newProtocol
-                                                   )
-                                            )
-                        currentDocument = Document.objects.get(id=int(eachDocument))
-                        currentDocument.status = 'in-courier'
-                        currentDocument.save()
-                        
-                    Requests.objects.bulk_create(requestList)
+                        if eachDocument not in archiveDocuments:
+                            requestList.append(Requests(
+                                                            documentID = Document.objects.get(id=int(eachDocument)),
+                                                            status = 'in-progress',
+                                                            protocolID = newProtocol
+                                                       )
+                                                )
+                            currentDocument = Document.objects.get(id=int(eachDocument))
+                            currentDocument.status = 'in-courier'
+                            currentDocument.save()
+                    
+                    if requestList:
+                        Requests.objects.bulk_create(requestList)
 
-
-                    response = HttpResponse(content_type='application/pdf')
-                    response['Content-Disposition'] = 'attachment; filename="Protocol-' + str(datetime.datetime.now()) +'.pdf"'
-                    boxstyle = [
-                                    ('ALIGN',         (0,0), (-1,0), 'CENTER'),
-                                    ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
-                                    ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-                                    ('TOPPADDING',    (0,0), (-1,-1), 1),
-                                    ('LEFTPADDING',   (0,0), (-1,-1), 10),
-                                    ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
-                                    ('FONT',          (0,0), (-1,0),  'b', 10),
-                                    ('FONT',          (0,1), (-1,-1),  'n', 10),
-                                ]
-                    boxText =   [
-                            [u'Архивна Единица', u'Забележка']
-                        ]
-
-                    boxCols = [12*cm, 5*cm]
-                    signBoxCols = [6*cm,3*cm,6*cm]
-                    signBoxStyle = [
-                                    ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
-                                    ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-                                    ('FONT',          (0,0), (-1,-1),  'n', 10)
+                        response = HttpResponse(content_type='application/pdf')
+                        response['Content-Disposition'] = 'attachment; filename="Protocol-' + str(datetime.datetime.now()) +'.pdf"'
+                        boxstyle = [
+                                        ('ALIGN',         (0,0), (-1,0), 'CENTER'),
+                                        ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
+                                        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                        ('TOPPADDING',    (0,0), (-1,-1), 1),
+                                        ('LEFTPADDING',   (0,0), (-1,-1), 10),
+                                        ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
+                                        ('FONT',          (0,0), (-1,0),  'b', 10),
+                                        ('FONT',          (0,1), (-1,-1),  'n', 10),
                                     ]
+                        boxText =   [
+                                [u'Архивна Единица', u'Забележка']
+                            ]
 
-                    criteriaFront = ''
-                    for eachRequest in requestList:
-                        criterionObject = Criterion.objects.get(documentID = eachRequest.documentID)
-                        # boxText.append([
-                        #     # ['Индекс 1: ' + criterionObject.field1 + '<br/>', ''],
-                        #     # ['Индекс 2: ' + criterionObject.field2 + '<br/>', ''],
-                        #     # ['Индекс 3: ' + criterionObject.field3 + '<br/>', ''],
-                        #     # ['Индекс 4: ' + criterionObject.field4 + '<br/>', ''],
-                        #     # ['Индекс 5: ' + criterionObject.field5 + '<br/>', ''],
-                        #     # ['Индекс 6: ' + criterionObject.field6 + '<br/>', ''],
-                        #     # ['Индекс 7: ' + criterionObject.field7 + '<br/>', ''],
-                        #     # ['Индекс 8: ' + criterionObject.field8 + '<br/>', ''],
-                        #     # ['Индекс 9: ' + criterionObject.field9 + '<br/>', ''],
-                        #     ['hello', '']
-                        #     ])
-                        criteriaFront += 'Индекс 1: ' + criterionObject.field1 + '<br/>'
-                        criteriaFront += 'Индекс 2: ' + criterionObject.field2 + '<br/>'
-                        criteriaFront += 'Индекс 3: ' + criterionObject.field3 + '<br/>'
-                        criteriaFront += 'Индекс 4: ' + criterionObject.field4 + '<br/>'
-                        criteriaFront += 'Индекс 5: ' + criterionObject.field5 + '<br/>'
-                        criteriaFront += 'Индекс 6: ' + criterionObject.field6 + '<br/>'
-                        criteriaFront += 'Индекс 7: ' + criterionObject.field7 + '<br/>'
-                        criteriaFront += 'Индекс 8: ' + criterionObject.field8 + '<br/>'
-                        criteriaFront += 'Индекс 9: ' + criterionObject.field9 + '<br/>'
+                        boxCols = [12*cm, 5*cm]
+                        signBoxCols = [6*cm,3*cm,6*cm]
+                        signBoxStyle = [
+                                        ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
+                                        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                        ('FONT',          (0,0), (-1,-1),  'n', 10)
+                                        ]
 
-                    header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
-                    ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ КЪМ ЦЕНТРАЛНО УПРАВЛЕНИЕ (%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
-                    textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на ДСК предаде
-                    на …............................................................, представител на ДСК следната архивна единица:
-                        ''',styleNormal)
-                    boxText.append([
-                        Paragraph(criteriaFront,styleCenter),
-                        ''
-                        ])
-                    textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
-                        ''', styleNormal)
-                    signBox = [
+                        criteriaFront = ''
+                        for eachRequest in requestList:
+                            criterionObject = Criterion.objects.get(documentID = eachRequest.documentID)
+                            # boxText.append([
+                            #     # ['Индекс 1: ' + criterionObject.field1 + '<br/>', ''],
+                            #     # ['Индекс 2: ' + criterionObject.field2 + '<br/>', ''],
+                            #     # ['Индекс 3: ' + criterionObject.field3 + '<br/>', ''],
+                            #     # ['Индекс 4: ' + criterionObject.field4 + '<br/>', ''],
+                            #     # ['Индекс 5: ' + criterionObject.field5 + '<br/>', ''],
+                            #     # ['Индекс 6: ' + criterionObject.field6 + '<br/>', ''],
+                            #     # ['Индекс 7: ' + criterionObject.field7 + '<br/>', ''],
+                            #     # ['Индекс 8: ' + criterionObject.field8 + '<br/>', ''],
+                            #     # ['Индекс 9: ' + criterionObject.field9 + '<br/>', ''],
+                            #     ['hello', '']
+                            #     ])
+                            criteriaFront += 'Индекс 1: ' + criterionObject.field1 + '<br/>'
+                            criteriaFront += 'Индекс 2: ' + criterionObject.field2 + '<br/>'
+                            criteriaFront += 'Индекс 3: ' + criterionObject.field3 + '<br/>'
+                            criteriaFront += 'Индекс 4: ' + criterionObject.field4 + '<br/>'
+                            criteriaFront += 'Индекс 5: ' + criterionObject.field5 + '<br/>'
+                            criteriaFront += 'Индекс 6: ' + criterionObject.field6 + '<br/>'
+                            criteriaFront += 'Индекс 7: ' + criterionObject.field7 + '<br/>'
+                            criteriaFront += 'Индекс 8: ' + criterionObject.field8 + '<br/>'
+                            criteriaFront += 'Индекс 9: ' + criterionObject.field9 + '<br/>'
 
-                        [u'Дата: ' + datetime.datetime.now().strftime("%d.%m.%Y")+u'г.', u'', u''],
-                        [u'', u''],
+                        header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
+                        ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ КЪМ ЦЕНТРАЛНО УПРАВЛЕНИЕ (%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
+                        textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на ДСК предаде
+                        на …............................................................, представител на ДСК следната архивна единица:
+                            ''',styleNormal)
+                        boxText.append([
+                            Paragraph(criteriaFront,styleCenter),
+                            ''
+                            ])
+                        textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
+                            ''', styleNormal)
+                        signBox = [
 
-                        [u'ПРИЕЛ: ....................................',  u'',  u'ПРЕДАЛ: .....................................'],
+                            [u'Дата: ' + datetime.datetime.now().strftime("%d.%m.%Y")+u'г.', u'', u''],
+                            [u'', u''],
 
-                        [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
+                            [u'ПРИЕЛ: ....................................',  u'',  u'ПРЕДАЛ: .....................................'],
 
-                    ]
-                    cfs=[Spacer(0, 0.3*cm),
-                        header,
-                        Spacer(0, 0.3*cm),
-                        textBeforeTable,
-                        Spacer(0, 0.3*cm),
-                        Table(boxText, style=boxstyle, colWidths=boxCols),
-                        Spacer(0, 0.3*cm),
-                        textUnderTable,
-                        Spacer(0, 0.3*cm),
-                        Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
-                        Spacer(0, 0.5*cm),
-                        Paragraph(u'________________________________________________________________________________' , styleNormal),
-                        Spacer(0, 0.3*cm),
-                        header,
-                        Spacer(0, 0.3*cm),
-                        textBeforeTable,
-                        Spacer(0, 0.3*cm),
-                        Table(boxText, style=boxstyle, colWidths=boxCols),
-                        Spacer(0, 0.3*cm),
-                        textUnderTable,
-                        Spacer(0, 0.3*cm),
-                        Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
-                        Spacer(0, 0.3*cm),
-                         ]
-                    self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
-                    return response
+                            [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
+
+                        ]
+                        cfs=[Spacer(0, 0.3*cm),
+                            header,
+                            Spacer(0, 0.3*cm),
+                            textBeforeTable,
+                            Spacer(0, 0.3*cm),
+                            Table(boxText, style=boxstyle, colWidths=boxCols),
+                            Spacer(0, 0.3*cm),
+                            textUnderTable,
+                            Spacer(0, 0.3*cm),
+                            Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                            Spacer(0, 0.5*cm),
+                            Paragraph(u'________________________________________________________________________________' , styleNormal),
+                            Spacer(0, 0.3*cm),
+                            header,
+                            Spacer(0, 0.3*cm),
+                            textBeforeTable,
+                            Spacer(0, 0.3*cm),
+                            Table(boxText, style=boxstyle, colWidths=boxCols),
+                            Spacer(0, 0.3*cm),
+                            textUnderTable,
+                            Spacer(0, 0.3*cm),
+                            Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                            Spacer(0, 0.3*cm),
+                             ]
+                        self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
+                        return response
 
                 elif archiveDocuments:
                     newProtocol = Protocols.objects.create(
@@ -249,99 +249,105 @@ class Office(View):
                                                 toLocation = 'storage 2', # central
                                             )
                     for eachDocument in centralDocuments:
-                        requestList.append(Requests(
-                                                        documentID = Document.objects.get(id=int(eachDocument)),
-                                                        status = 'in-progress',
-                                                        protocolID = newProtocol
-                                                   )
-                                            )
-                    Requests.objects.bulk_create(requestList)
+                        if eachDocument in archiveDocuments:
+                            requestList.append(Requests(
+                                                            documentID = Document.objects.get(id=int(eachDocument)),
+                                                            status = 'in-progress',
+                                                            protocolID = newProtocol
+                                                       )
+                                                )
+                            currentDocument = Document.objects.get(id=int(eachDocument))
+                            currentDocument.status = 'in-courier'
+                            currentDocument.save()
+                    if requestList:
+                        Requests.objects.bulk_create(requestList)
 
-
-                    response = HttpResponse(content_type='application/pdf')
-                    response['Content-Disposition'] = 'attachment; filename="Protocol-' + str(datetime.datetime.now()) +'.pdf"'
-                    boxstyle = [
-                                    ('ALIGN',         (0,0), (-1,0), 'CENTER'),
-                                    ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
-                                    ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-                                    ('TOPPADDING',    (0,0), (-1,-1), 1),
-                                    ('LEFTPADDING',   (0,0), (-1,-1), 10),
-                                    ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
-                                    ('FONT',          (0,0), (-1,0),  'b', 10),
-                                    ('FONT',          (0,1), (-1,-1),  'n', 10),
-                                ]
-                    boxText =   [
-                            [u'Архивна Единица', u'Забележка']
-                        ]
-
-                    boxCols = [12*cm, 5*cm]
-                    signBoxCols = [6*cm,3*cm,6*cm]
-                    signBoxStyle = [
-                                    ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
-                                    ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-                                    ('FONT',          (0,0), (-1,-1),  'n', 10)
+                        response = HttpResponse(content_type='application/pdf')
+                        response['Content-Disposition'] = 'attachment; filename="Protocol-' + str(datetime.datetime.now()) +'.pdf"'
+                        boxstyle = [
+                                        ('ALIGN',         (0,0), (-1,0), 'CENTER'),
+                                        ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
+                                        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                        ('TOPPADDING',    (0,0), (-1,-1), 1),
+                                        ('LEFTPADDING',   (0,0), (-1,-1), 10),
+                                        ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
+                                        ('FONT',          (0,0), (-1,0),  'b', 10),
+                                        ('FONT',          (0,1), (-1,-1),  'n', 10),
                                     ]
+                        boxText =   [
+                                [u'Архивна Единица', u'Забележка']
+                            ]
 
-                    criteriaFront = ''
-                    for eachRequest in requestList:
-                        criterionObject = Criterion.objects.get(documentID = eachRequest.documentID)
-                        criteriaFront += 'Индекс 1: ' + criterionObject.field1 + '<br/>'
-                        criteriaFront += 'Индекс 2: ' + criterionObject.field2 + '<br/>'
-                        criteriaFront += 'Индекс 3: ' + criterionObject.field3 + '<br/>'
-                        criteriaFront += 'Индекс 4: ' + criterionObject.field4 + '<br/>'
-                        criteriaFront += 'Индекс 5: ' + criterionObject.field5 + '<br/>'
-                        criteriaFront += 'Индекс 6: ' + criterionObject.field6 + '<br/>'
-                        criteriaFront += 'Индекс 7: ' + criterionObject.field7 + '<br/>'
-                        criteriaFront += 'Индекс 8: ' + criterionObject.field8 + '<br/>'
-                        criteriaFront += 'Индекс 9: ' + criterionObject.field9 + '<br/>'
+                        boxCols = [12*cm, 5*cm]
+                        signBoxCols = [6*cm,3*cm,6*cm]
+                        signBoxStyle = [
+                                        ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
+                                        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                        ('FONT',          (0,0), (-1,-1),  'n', 10)
+                                        ]
 
-                    header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
-                    ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ КЪМ АРХИВ (%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
-                    textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на ДСК предаде
-                    на …............................................................, представител на ДСК следната архивна единица:
-                        ''',styleNormal)
-                    boxText.append([
-                        Paragraph(criteriaFront,styleCenter),
-                        ''
-                        ])
-                    textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
-                        ''', styleNormal)
-                    signBox = [
+                        criteriaFront = ''
+                        for eachRequest in requestList:
+                            criterionObject = Criterion.objects.get(documentID = eachRequest.documentID)
+                            criteriaFront += 'Индекс 1: ' + criterionObject.field1 + '<br/>'
+                            criteriaFront += 'Индекс 2: ' + criterionObject.field2 + '<br/>'
+                            criteriaFront += 'Индекс 3: ' + criterionObject.field3 + '<br/>'
+                            criteriaFront += 'Индекс 4: ' + criterionObject.field4 + '<br/>'
+                            criteriaFront += 'Индекс 5: ' + criterionObject.field5 + '<br/>'
+                            criteriaFront += 'Индекс 6: ' + criterionObject.field6 + '<br/>'
+                            criteriaFront += 'Индекс 7: ' + criterionObject.field7 + '<br/>'
+                            criteriaFront += 'Индекс 8: ' + criterionObject.field8 + '<br/>'
+                            criteriaFront += 'Индекс 9: ' + criterionObject.field9 + '<br/>'
 
-                        [u'Дата: ' + datetime.datetime.now().strftime("%d.%m.%Y")+u'г.', u'', u''],
-                        [u'', u''],
+                        header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
+                        ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ КЪМ АРХИВ (%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
+                        textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на ДСК предаде
+                        на …............................................................, представител на ДСК следната архивна единица:
+                            ''',styleNormal)
+                        boxText.append([
+                            Paragraph(criteriaFront,styleCenter),
+                            ''
+                            ])
+                        textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
+                            ''', styleNormal)
+                        signBox = [
 
-                        [u'ПРИЕЛ: ....................................',  u'',  u'ПРЕДАЛ: .....................................'],
+                            [u'Дата: ' + datetime.datetime.now().strftime("%d.%m.%Y")+u'г.', u'', u''],
+                            [u'', u''],
 
-                        [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
+                            [u'ПРИЕЛ: ....................................',  u'',  u'ПРЕДАЛ: .....................................'],
 
-                    ]
-                    cfs=[Spacer(0, 0.5*cm),
-                        header,
-                        Spacer(0, 0.5*cm),
-                        textBeforeTable,
-                        Spacer(0, 0.5*cm),
-                        Table(boxText, style=boxstyle, colWidths=boxCols),
-                        Spacer(0, 0.5*cm),
-                        textUnderTable,
-                        Spacer(0, 0.5*cm),
-                        Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
-                        Spacer(0, 0.7*cm),
-                        Paragraph(u'________________________________________________________________________________' , styleNormal),
-                        Spacer(0, 0.5*cm),
-                        header,
-                        Spacer(0, 0.5*cm),
-                        textBeforeTable,
-                        Spacer(0, 0.5*cm),
-                        Table(boxText, style=boxstyle, colWidths=boxCols),
-                        Spacer(0, 0.5*cm),
-                        textUnderTable,
-                        Spacer(0, 0.5*cm),
-                        Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
-                        Spacer(0, 0.7*cm),
-                         ]
-                    self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
-                    return response
+                            [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
+
+                        ]
+                        cfs=[Spacer(0, 0.5*cm),
+                            header,
+                            Spacer(0, 0.5*cm),
+                            textBeforeTable,
+                            Spacer(0, 0.5*cm),
+                            Table(boxText, style=boxstyle, colWidths=boxCols),
+                            Spacer(0, 0.5*cm),
+                            textUnderTable,
+                            Spacer(0, 0.5*cm),
+                            Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                            Spacer(0, 0.7*cm),
+                            Paragraph(u'________________________________________________________________________________' , styleNormal),
+                            Spacer(0, 0.5*cm),
+                            header,
+                            Spacer(0, 0.5*cm),
+                            textBeforeTable,
+                            Spacer(0, 0.5*cm),
+                            Table(boxText, style=boxstyle, colWidths=boxCols),
+                            Spacer(0, 0.5*cm),
+                            textUnderTable,
+                            Spacer(0, 0.5*cm),
+                            Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                            Spacer(0, 0.7*cm),
+                             ]
+                        self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
+                        return response
+
+            return render_to_response('move/error.html', locals(), context)
 
 
 
