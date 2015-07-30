@@ -76,6 +76,13 @@ mflm, mfbm, mfw, mfh = 1, 0.7, 19, [28, 28]
 
 
 class Office(View):
+    class returnRequests(View):
+        @method_decorator(login_required)
+        def get(self,request):
+            pass        
+        def post(self, request):
+            pass
+
     class moveToCentral(View):
         class RequestTemplate(SimpleDocTemplate):
             def addPageTemplates(self,pageTemplates):
@@ -348,8 +355,6 @@ class Office(View):
                         return response
 
             return render_to_response('move/error.html', locals(), context)
-
-
 
     class preview(View):
         @method_decorator(login_required)
