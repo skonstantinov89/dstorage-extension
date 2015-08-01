@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'office',
     'central_management',
     'system',
+    'requester',
     'debug_toolbar'
 )
 

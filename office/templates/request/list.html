@@ -1,0 +1,161 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+    <div class="jumbotron">
+      <div class="container">
+        <table class="table table-bordered table-hover" id = 'table'>
+        <thead style='text-align: center'>
+            <tr>
+                <th>Номер на протокол</th>
+                <th>Номер на документ</th>
+                <th>Индекси</th>
+                <th>Статус</th>
+                <th>Операции</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for eachElement in frontData%}
+            {% if eachElement.documentID.status != 'incorrect-input' %}
+
+            <tr align='left'>
+                <td style="vertical-align:middle"> <p align="center"> {{eachElement.request.protocolID.id|stringformat:"05d"}} </p> </td>
+                <td style="vertical-align:middle"> <p align="center"> {{eachElement.request.documentID.id|stringformat:"05d"}} </p></td>
+                <td style="vertical-align:middle"> 
+                        Индекс 1: {{eachElement.document.field1}} </br>
+                        Индекс 2: {{eachElement.document.field2}} </br>
+                        Индекс 3: {{eachElement.document.field3}} </br>
+                        Индекс 4: {{eachElement.document.field4}} </br>
+                        Индекс 5: {{eachElement.document.field5}} </br>
+                        Индекс 6: {{eachElement.document.field6}} </br>
+                        Индекс 7: {{eachElement.document.field7}} </br>
+                        Индекс 8: {{eachElement.document.field8}} </br>
+                        Индекс 9: {{eachElement.document.field9}} </br>
+                </td>
+
+                <td style="vertical-align:middle"> 
+                <p align='center'> Не потвърдена</p>
+                </td>
+                <td style="vertical-align:middle"> 
+            <div id='move'>
+                <button class='btn btn-success btn-block incorrect' value='{{eachElement.request.id}}'>Грешен</button>
+                <button class='btn btn-primary btn-block missing' value='{{eachElement.request.id}}'> Липсва </button>
+            </div>  
+
+                </td>
+
+            </tr>
+            {%endif%}
+            {%endfor%}
+        </tbody>
+    </table>
+    <div class='col-md-offset-4' align='left'>
+        <form method='post' id='submit_to_return'> 
+        {% csrf_token %}
+            <input type='text' class='form-control'name='incorrectRequests' id='incorrectRequests' hidden/>
+            <input type='text' class='form-control' name='missingRequest' id='missingRequest' hidden/>
+        <div class='col-md-7'>
+            <button type='submit' class='btn btn-primary btn-block' name = 'confirmButton' id='confirmButton' value='confirm'> Потвърди </button>
+        </div>
+    </form>
+    </div>
+
+  </div>
+
+
+
+    <script type="text/javascript">
+    var centralArrayID = new Array()
+    var archiveArrayID = new Array()
+
+    $(document).ready(function(){
+        $('#table').DataTable({
+        "iDisplayLength": 50,
+        "bLengthChange": false,
+        "autoWidth": true,
+        "bFilter": true,
+        'bSort': true,
+        "bPaginate": false,
+        'language': {
+                        "sProcessing":   "Обработка на резултатите...",
+                        "sLengthMenu":   "Показване на _MENU_ резултата",
+                        "sZeroRecords":  "Няма намерени резултати",
+                        "sInfo":         "Показване на резултати от _START_ до _END_ от общо _TOTAL_",
+                        "sInfoEmpty":    "Показване на резултати от 0 до 0 от общо 0",
+                        "sInfoFiltered": "(филтрирани от общо _MAX_ резултата)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Търсене във всички колони:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Първа",
+                            "sPrevious": "Предишна",
+                            "sNext":     "Следваща",
+                            "sLast":     "Последна"
+                        }
+                    }
+        });
+    });
+
+    $(document).on('click','.incorrect',function(){
+        var value= $(this).val();
+        centralArrayID.push(value);
+
+        $(this).next().prop('disabled', true);
+        $(this).replaceWith("<button class='btn btn-block btn-warning cancel-incorrect' value="+ value +"> Откажи </button>");
+
+        $('#incorrectRequests').prop('value', centralArrayID);
+    });
+    $(document).on('click','.missing', function(){
+        var value= $(this).val();
+        archiveArrayID.push(value);
+
+        $(this).prev().prop("disabled", true);
+        $(this).replaceWith("<button class='btn btn-block btn-warning cancel-missing' value="+ value +"> Откажи </button>");
+
+        $('#missingRequest').prop('value', archiveArrayID);
+    });
+
+    $(document).on('click','.cancel-incorrect',function(){
+        
+        var value = $(this).val();
+        var index = centralArrayID.indexOf(value);
+        if (index > -1){
+            centralArrayID.splice(index, 1);
+        }
+        $(this).next().prop("disabled", false);
+        $(this).replaceWith("<button class='btn btn-success btn-block incorrect' value="+ value +"> Добави в списък за ЦУ </button>");
+
+        $('#incorrectRequests').prop('value', centralArrayID);
+
+    });
+    $(document).on('click','.cancel-missing',function(){
+        
+        var value = $(this).val();
+        var index = archiveArrayID.indexOf(value);
+        if (index > -1){
+            archiveArrayID.splice(index, 1);
+        }
+        $(this).prev().prop('disabled', false);
+        $(this).replaceWith("<button class='btn btn-primary btn-block missing' value="+ value +"> Добави в списък за архив </button>");
+
+
+        $('#missingRequest').prop('value', archiveArrayID);
+    });
+    $(document).on('click','#submit', function(event){
+        var centralValue = $('#incorrectRequests').val();
+        var archiveValue = $('#missingRequest').val();
+
+        if (centralValue.length > 0 || archiveValue.length > 0){
+                $('#submit_to_return').submit();
+        }
+        else{
+            event.preventDefault();
+            alert('Не сте избрали документи за предаване!');
+        }
+    });
+
+    </script>
+
+      </div>
+    </div>
+    {%endblock%}

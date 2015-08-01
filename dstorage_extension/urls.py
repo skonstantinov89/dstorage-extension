@@ -29,4 +29,5 @@ urlpatterns = [
 
     url(r'^office',             include('office.urls')),
     url(r'^central-management', include('central_management.urls')),
+    url(r'^requester',          include('requester.urls')),
 ]

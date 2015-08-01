@@ -1,0 +1,25 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+    
+    <div class="jumbotron">
+      <div class="container">
+        <h2 align="center">Търси по номер на протокол</h2>
+      <!-- Example row of columns -->
+      <div class="row">
+        <form method='post'>
+        <div class="col-md-4 col-md-offset-4 form-group" align="center">
+          {% csrf_token %}
+          <input type='text' class='form-control' name='protocolID' placeholder = 'Номер на протокол' />
+          <button name='searchButton' class="btn btn-default btn-block" type='submit' value='search'>Търси</button>
+        </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+
+      <hr>
+
+{%endblock%}

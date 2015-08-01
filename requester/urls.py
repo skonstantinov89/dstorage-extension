@@ -15,15 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from office.views import Office
+from requester.views import Requester
 
 
 urlpatterns = [
     # url(r'home$', ''''),
-    url(r'request-finish$',      Office.finishRequests.as_view(),   name='finishRequests'),
-    url(r'move-central$',        Office.moveToCentral.as_view(),    name='moveToCentral'),
-    url(r'preview$',             Office.preview.as_view(),          name='preview'),
-    url(r'create-new$',          Office.createNewDoc.as_view(),     name='createNewDoc'),
-    url(r'create-bulk$',         Office.createBulk.as_view(),       name='createBulk'),
-    url(r'$',                    Office.index.as_view(),            name='index'),
+    url(r'request$',             Requester.requestDocument.as_view(),   name='requestDocument'),
+    url(r'$',                    Requester.index.as_view(),             name='index'),
 ]
