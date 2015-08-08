@@ -101,19 +101,25 @@ class Office(View):
             confirmButton = request.POST.get('confirmButton', '')
 
             if searchButton != '':
-                requestData = Requests.objects.select_related().filter(
-                                                                        Q(protocolID = int(protocolID)),
-                                                                        Q(status='not-verified')
-                                                                      )
-                frontData = []
+                if protocolID != '':
+                    try:
+                        requestData = Requests.objects.select_related().filter(
+                                                                                    Q(protocolID = int(protocolID)),
+                                                                                    Q(status='not-verified')
+                                                                                  )
+                    except:
+                        return render_to_response('request/error_mising_protocol.html', context)
+                    frontData = []
 
-                for eachRequest in requestData:
-                    frontData.append({
-                        'request': eachRequest,
-                        'document': Criterion.objects.select_related().get(documentID = eachRequest.documentID)
-                        })
-                searchButton = ''
-                return render_to_response('request/list.html', locals(), context)
+                    for eachRequest in requestData:
+                        frontData.append({
+                            'request': eachRequest,
+                            'document': Criterion.objects.select_related().get(documentID = eachRequest.documentID)
+                            })
+                    searchButton = ''
+                    return render_to_response('request/list.html', locals(), context)
+                else:
+                    return render_to_response('request/error_mising_protocol.html', context)
             
             elif confirmButton != '':
                 incorrectRequests = request.POST.get('incorrectRequests', '').split(',')
@@ -382,7 +388,7 @@ class Office(View):
                                                        )
                                                 )
                             currentDocument = Document.objects.get(id=int(eachDocument))
-                            if currentDocument.status == 'in-courier':
+                            if currentDocument.status == 'in-courier' and currentDocument.location == 'storage 1':
                                 requestList.pop()
                                 newProtocol.delete()
                                 return render_to_response('move/error_incorrect_documents.html', context)
@@ -470,8 +476,13 @@ class Office(View):
                                                        )
                                                 )
                             currentDocument = Document.objects.get(id=int(eachDocument))
-                            currentDocument.status = 'in-courier'
-                            currentDocument.save()
+                            if currentDocument.status == 'in-courier' and currentDocument.location == 'storage 1':
+                                requestList.pop()
+                                newProtocol.delete()
+                                return render_to_response('move/error_incorrect_documents.html', context)
+                            else:
+                                currentDocument.status = 'in-courier'
+                                currentDocument.save()
                     if requestList:
                         Requests.objects.bulk_create(requestList)
 
