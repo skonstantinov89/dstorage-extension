@@ -382,8 +382,13 @@ class Office(View):
                                                        )
                                                 )
                             currentDocument = Document.objects.get(id=int(eachDocument))
-                            currentDocument.status = 'in-courier'
-                            currentDocument.save()
+                            if currentDocument.status == 'in-courier':
+                                requestList.pop()
+                                newProtocol.delete()
+                                return render_to_response('move/error_incorrect_documents.html', context)
+                            else:
+                                currentDocument.status = 'in-courier'
+                                currentDocument.save()
                     
                     if requestList:
                         Requests.objects.bulk_create(requestList)
@@ -531,26 +536,47 @@ class Office(View):
                         self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
                         return response
             elif listButton != '':
-                text = Paragraph(u'ОПИС',styleNormal)
+                response = HttpResponse(content_type='application/pdf')
+                response['Content-Disposition'] = 'attachment; filename="Document-list-' + str(datetime.datetime.now()) +'.pdf"'
+                centralDocuments = request.POST.get('centralDocuments', '').split(',')
+                archiveDocuments = request.POST.get('archiveDocuments', '').split(',')
+
+                text = Paragraph(u'ОПИС',styleBoldCenter)
                 if centralDocuments:
                     boxTextCentral = []
+                    boxstyle = [
+                                    ('ALIGN',         (0,0), (-1,0), 'CENTER'),
+                                    ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
+                                    ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                    ('TOPPADDING',    (0,0), (-1,-1), 1),
+                                    ('LEFTPADDING',   (0,0), (-1,-1), 10),
+                                    ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
+                                    ('FONT',          (0,0), (-1,0),  'b', 10),
+                                    ('FONT',          (0,1), (-1,-1),  'n', 10),
+                                ]
+                    boxTextCentral =   [
+                            [u'Документ (критерии)', u'Забележка']
+                        ]
+
+                    boxCols = [12*cm, 5*cm]
+
                     for eachDocument in centralDocuments:
-                        criterionObject = Criterion.objects.filter(documentID = int(eachDocument))
+                        criterionObject = Criterion.objects.get(documentID = int(eachDocument))
                         boxTextCentral.append(
                                                 [
-                                                Paragraph(
-                                                    criterionObject.field1 + '</br>'
-                                                    criterionObject.field2 + '</br>'
-                                                    criterionObject.field3 + '</br>'
-                                                    criterionObject.field4 + '</br>'
-                                                    criterionObject.field5 + '</br>'
-                                                    criterionObject.field6 + '</br>'
-                                                    criterionObject.field7 + '</br>'
-                                                    criterionObject.field8 + '</br>'
-                                                    criterionObject.field9 + '</br>'
-                                                    criterionObject.field10 + '</br>'
-                                                    criterionObject.field11 + '</br>'
-                                                    criterionObject.field12 + '</br>'
+                                                Paragraph(str(
+                                                    '<b> Име на регион: </b> ' + criterionObject.field1 + '<br/>' + 
+                                                    '<b> Име на клон: </b>' + criterionObject.field2 + '<br/>' + 
+                                                    '<b> Клиентски номер: </b>' + criterionObject.field3 + '<br/>' + 
+                                                    '<b> ЕИК/БУЛСТАТ: </b>' + criterionObject.field4 + '<br/>' + 
+                                                    '<b> Име на клиент: </b> ' + criterionObject.field5 + '<br/>' + 
+                                                    '<b> Дата на договор: </b>' + criterionObject.field6 + '<br/>' + 
+                                                    '<b> Номер на сметка: </b>' + criterionObject.field7 + '<br/>' +
+                                                    '<b> Размер на кредит: </b>' + criterionObject.field8 + '<br/>' +
+                                                    '<b> Валута: </b>' + criterionObject.field9 + '<br/>' +
+                                                    '<b> КИ идентификатор: </b>' + criterionObject.field10 + '<br/>' +
+                                                    '<b> Вид на документ: </b> ' + criterionObject.field11 + '<br/>' +
+                                                    '<b> Описание: </b>' + criterionObject.field12 + '<br/>')
                                                     , styleNormal),
                                                 ''
                                                 ]
@@ -559,11 +585,11 @@ class Office(View):
                                     Spacer(0, 0.2*cm),
                                     text,
                                     Spacer(0, 0.5*cm),
-                                    Table(boxTextOriginal, style=boxstyle, colWidths=boxCols),
+                                    Table(boxTextCentral, style=boxstyle, colWidths=boxCols),
                                     Spacer(0, 1*cm),
                                     PageBreak()
                                 ]
-                    self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
+                    self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs_Central)
                     return response
 
 
