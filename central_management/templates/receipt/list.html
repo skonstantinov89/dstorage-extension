@@ -1,0 +1,178 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+    <div class="jumbotron">
+      <div class="container">
+        <table class="table table-bordered table-hover" id = 'table2'>
+        <thead style='text-align: center'>
+            <tr>
+                <th>Номер на Протокол: {{protocolID}}</th>
+            </tr>
+        </thead>
+        <table class="table table-bordered table-hover" id = 'table'>
+        <thead style='text-align: center'>
+            <tr>
+                <th>Номер на Документа</th>
+                <th>Критерии </th>
+                <th>Статус</th>
+                <th>Операции</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for eachElement in frontData%}
+            {% if eachElement.request.status == "in-progress" %}
+
+            <tr align='left'>
+                <td style="vertical-align:middle"> {{eachElement.request.documentID.id}} </td>
+                <td style="vertical-align:middle"> 
+                        Критерии 1: {{eachElement.fields.field1}} </br>
+                        Критерии 2: {{eachElement.fields.field2}} </br>
+                        Критерии 3: {{eachElement.fields.field3}} </br>
+                        Критерии 4: {{eachElement.fields.field4}} </br>
+                        Критерии 5: {{eachElement.fields.field5}} </br>
+                        Критерии 6: {{eachElement.fields.field6}} </br>
+                        Критерии 7: {{eachElement.fields.field7}} </br>
+                        Критерии 8: {{eachElement.fields.field8}} </br>
+                        Критерии 9: {{eachElement.fields.field9}} </br>
+                </td>
+
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.request.documentID.status == 'in-warehouse' %}
+                        Наличен
+                    {% elif eachElement.request.documentID.status == 'in-courier' %}
+                        В транзит/Чака проверка
+                    {% elif eachElement.request.documentID.status == 'destroyed' %}
+                        Унищожен
+                    {% endif %}
+                </td>
+                <td style="vertical-align:middle"> 
+            <div id='move'>
+                <button class='btn btn-success btn-block add_as_accepted' value='{{eachElement.request.documentID.id}}'> Приеми </button>
+                <button class='btn btn-danger btn-block add_as_rejected' value='{{eachElement.request.documentID.id}}'> Върни </button>
+            </div>  
+                </td>
+
+            </tr>
+            {%endif%}
+            {%endfor%}
+        </tbody>
+    </table>
+    <div class='col-md-offset-4' align='left'>
+        <form method='post' id='submit_to_accept'> 
+        {% csrf_token %}
+            <label>
+              Списък с документи за приемане в централно управление:
+            <input type='text' class='form-control'name='acceptedDocuments' id='acceptedDocuments' />
+        </label>
+        </br>
+            <label>
+              Списък с некоректни документи за връщане с протокола:
+            <input type='text' class='form-control' name='rejectedDocuments' id='rejectedDocuments' />
+        </label>
+        </br>
+        <div class='col-md-7'>
+            <button type='submit' class='btn btn-primary btn-block' id='submit'> Потвърди </button>
+        </div>
+    </form>
+    </div>
+
+  </div>
+
+
+
+    <script type="text/javascript">
+    var acceptedArrayID = new Array()
+    var rejectedArrayID = new Array()
+
+    $(document).ready(function(){
+        $('#table').DataTable({
+        "iDisplayLength": 50,
+        "bLengthChange": false,
+        "autoWidth": true,
+        "bFilter": true,
+        'bSort': true,
+        "bPaginate": false,
+        'language': {
+                        "sProcessing":   "Обработка на резултатите...",
+                        "sLengthMenu":   "Показване на _MENU_ резултата",
+                        "sZeroRecords":  "Няма намерени резултати",
+                        "sInfo":         "Показване на резултати от _START_ до _END_ от общо _TOTAL_",
+                        "sInfoEmpty":    "Показване на резултати от 0 до 0 от общо 0",
+                        "sInfoFiltered": "(филтрирани от общо _MAX_ резултата)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Търсене във всички колони:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Първа",
+                            "sPrevious": "Предишна",
+                            "sNext":     "Следваща",
+                            "sLast":     "Последна"
+                        }
+                    }
+        });
+    });
+
+    $(document).on('click','.add_as_accepted',function(){
+        var value= $(this).val();
+        acceptedArrayID.push(value);
+		
+        $(this).next().prop('disabled', true);
+        $(this).replaceWith("<button class='btn btn-block btn-warning cancel-central' value="+ value +"> Откажи </button>");
+
+        $('#acceptedDocuments').prop('value', acceptedArrayID);
+    });
+    $(document).on('click','.add_as_rejected', function(){
+        var value= $(this).val();
+        rejectedArrayID.push(value);
+
+        $(this).prev().prop("disabled", true);
+        $(this).replaceWith("<button class='btn btn-block btn-warning cancel-archive' value="+ value +"> Откажи </button>");
+
+        $('#rejectedDocuments').prop('value', rejectedArrayID);
+    });
+
+    $(document).on('click','.cancel-central',function(){
+        
+        var value = $(this).val();
+        var index = acceptedArrayID.indexOf(value);
+        if (index > -1){
+            acceptedArrayID.splice(index, 1);
+        }
+        $(this).next().prop("disabled", false);
+        $(this).replaceWith("<button class='btn btn-success btn-block add_as_accepted' value="+ value +"> Приеми </button>");
+
+        $('#acceptedDocuments').prop('value', acceptedArrayID);
+
+    });
+    $(document).on('click','.cancel-archive',function(){
+        
+        var value = $(this).val();
+        var index = rejectedArrayID.indexOf(value);
+        if (index > -1){
+            rejectedArrayID.splice(index, 1);
+        }
+        $(this).prev().prop('disabled', false);
+        $(this).replaceWith("<button class='btn btn-danger btn-block add_as_rejected' value="+ value +"> Върни </button>");
+
+
+        $('#rejectedDocuments').prop('value', rejectedArrayID);
+    });
+    $(document).on('click','#submit', function(event){
+        var acceptedValue = $('#acceptedDocuments').val();
+        var rejectedValue = $('#rejectedDocuments').val();
+
+        if (acceptedValue.length > 0 || rejectedValue.length > 0){
+            $('#submit_to_accept').submit();
+        }
+        else{
+            event.preventDefault();
+            alert('Не сте избрали документи за приемане или връщане!');
+        }
+    });
+
+    </script>
+
+      </div>
+    </div>
+    {%endblock%}

@@ -1,0 +1,79 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+    <div class="jumbotron">
+      <div class="container">
+		
+        <table class="table table-bordered table-hover" id = 'table'>
+        <thead style='text-align: center'>
+            <tr>
+                <th>Номер на Документа</th>
+                <th>Критерии </th>
+                <th>Статус</th>
+                <th>Дата на създаване</th>
+                <th>Дата на преместване в ЦУ</th>
+                <th>Дата на преместване в ЦА</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for eachElement in criteriaData%}
+            {% if eachElement.documentID.status != 'incorrect-input' %}
+
+            <tr align='left'>
+                <td style="vertical-align:middle"> {{eachElement.documentID.id}} </td>
+                <td style="vertical-align:middle"> 
+                        Критерии 1: {{eachElement.fields.field1}} </br>
+                        Критерии 2: {{eachElement.fields.field2}} </br>
+                        Критерии 3: {{eachElement.fields.field3}} </br>
+                        Критерии 4: {{eachElement.fields.field4}} </br>
+                        Критерии 5: {{eachElement.fields.field5}} </br>
+                        Критерии 6: {{eachElement.fields.field6}} </br>
+                        Критерии 7: {{eachElement.fields.field7}} </br>
+                        Критерии 8: {{eachElement.fields.field8}} </br>
+                        Критерии 9: {{eachElement.fields.field9}} </br>
+                </td>
+
+                <td style="vertical-align:middle"> 
+                    {% if eachElement.documentID.status == 'in-warehouse' %}
+                    	{% if eachElement.documentID.location == 'storage 1' %}
+                        	Офис
+                    	{% elif eachElement.documentID.location == 'storage 2' %}
+                        	Централно Управление
+                    	{% elif eachElement.documentID.location == 'storage 3' %}
+                        	Централен Архив
+                        {% endif %}
+                    {% elif eachElement.documentID.status == 'in-courier' %}
+                        В транзит/Чака проверка
+                    {% elif eachElement.documentID.status == 'destroyed' %}
+                        Унищожен
+                    {% endif %}
+                </td>
+            	<td style="vertical-align:middle">
+            		{% if eachElement.documentID.officeStartDate != null %}
+            			{{eachElement.documentID.officeStartDate}}
+            		{% endif %}
+            	</td>
+            	<td style="vertical-align:middle">
+            		{% if eachElement.documentID.centralManagementStartDate != null %}
+            			{{eachElement.documentID.centralManagementStartDate}}
+            		{% endif %}
+            	</td>
+            	<td style="vertical-align:middle">
+            		{% if eachElement.documentID.archiveStartDate != null %}
+            			{{eachElement.documentID.archiveStartDate}}
+            		{% endif %}
+            	</td>           
+            </tr>
+            {%endif%}
+            {%endfor%}
+        </tbody>
+    </table>
+
+
+  </div>
+
+
+      </div>
+    </div>
+    {%endblock%}
