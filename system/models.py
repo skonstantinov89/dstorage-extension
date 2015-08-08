@@ -42,6 +42,23 @@ class Criterion(models.Model):
     field7 = models.TextField(blank=True, null=True)
     field8 = models.TextField(blank=True, null=True)
     field9 = models.TextField(blank=True, null=True)
+    field10 = models.TextField(blank=True, null=True)
+    field11 = models.TextField(blank=True, null=True)
+    field12 = models.TextField(blank=True, null=True)
+
+    # 1. Име на регион(или сигнатура)
+    # 2. Име на клон(сигнатура)
+    # 3. Клиентски номер
+    # 4. ЕИК/Булстат
+    # 5. Име на клиент
+    # 6. Дата на договор
+    # 7. Номер на сметка
+    # 8. Размер на кредит
+    # 9. Валута
+    # 10. КИ идентификатор
+    # 11. Вид на документ
+    # 12. Описание
+
 
 
 class Protocols (models.Model):

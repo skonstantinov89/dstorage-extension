@@ -20,15 +20,18 @@
             <tr align='left'>
                 <td style="vertical-align:middle"> {{eachElement.documentID.id}} </td>
                 <td style="vertical-align:middle"> 
-                        Критерии 1: {{eachElement.field1}} </br>
-                        Критерии 2: {{eachElement.field2}} </br>
-                        Критерии 3: {{eachElement.field3}} </br>
-                        Критерии 4: {{eachElement.field4}} </br>
-                        Критерии 5: {{eachElement.field5}} </br>
-                        Критерии 6: {{eachElement.field6}} </br>
-                        Критерии 7: {{eachElement.field7}} </br>
-                        Критерии 8: {{eachElement.field8}} </br>
-                        Критерии 9: {{eachElement.field9}} </br>
+                        Име на регион:      {{eachElement.field1}} </br>
+                        Име на клон:        {{eachElement.field2}} </br>
+                        Клиентски номер:    {{eachElement.field3}} </br>
+                        ЕИК/БУЛСТАТ:        {{eachElement.field4}} </br>
+                        Име на клиент:      {{eachElement.field5}} </br>
+                        Дата на договор:    {{eachElement.field6}} </br>
+                        номер на сметка:    {{eachElement.field7}} </br>
+                        Размер на кредит:   {{eachElement.field8}} </br>
+                        Валута:             {{eachElement.field9}} </br>
+                        КИ идентификатор:   {{eachElement.field10}} </br>
+                        Вид на документ:    {{eachElement.field11}} </br>
+                        Описание:           {{eachElement.field12}} </br>                
                 </td>
 
                 <td style="vertical-align:middle"> 
@@ -69,7 +72,8 @@
         </label>
         </br>
         <div class='col-md-7'>
-            <button type='submit' class='btn btn-primary btn-block' id='submit'> Потвърди </button>
+            <button type='submit' class='btn btn-primary btn-block' name='protocolButton' value = 'protocol' id='submit'> Разпечатай протокол </button>
+            <button type='submit' class='btn btn-primary btn-block' name='listButton' value = 'list' id='submit'> Разпечатай протокол </button>
         </div>
     </form>
     </div>

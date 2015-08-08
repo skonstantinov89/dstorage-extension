@@ -158,15 +158,18 @@ class Office(View):
                     for eachRequest in incorrectRequests:
                         requestObject = Requests.objects.select_related().get(id=int(eachRequest))
                         criterionObject = Criterion.objects.get(documentID = requestObject.documentID)
-                        criteriaFront += 'Критерии 1: ' + criterionObject.field1 + '<br/>'
-                        criteriaFront += 'Критерии 2: ' + criterionObject.field2 + '<br/>'
-                        criteriaFront += 'Критерии 3: ' + criterionObject.field3 + '<br/>'
-                        criteriaFront += 'Критерии 4: ' + criterionObject.field4 + '<br/>'
-                        criteriaFront += 'Критерии 5: ' + criterionObject.field5 + '<br/>'
-                        criteriaFront += 'Критерии 6: ' + criterionObject.field6 + '<br/>'
-                        criteriaFront += 'Критерии 7: ' + criterionObject.field7 + '<br/>'
-                        criteriaFront += 'Критерии 8: ' + criterionObject.field8 + '<br/>'
-                        criteriaFront += 'Критерии 9: ' + criterionObject.field9 + '<br/>'
+                        criteriaFront += 'Име на регион: ' + criterionObject.field1 + '<br/>'
+                        criteriaFront += 'Име на клон: ' + criterionObject.field2 + '<br/>'
+                        criteriaFront += 'Клиентски номер: ' + criterionObject.field3 + '<br/>'
+                        criteriaFront += 'ЕИК/БУЛСТАТ: ' + criterionObject.field4 + '<br/>'
+                        criteriaFront += 'Име на клиент: ' + criterionObject.field5 + '<br/>'
+                        criteriaFront += 'Дата на договор: ' + criterionObject.field6 + '<br/>'
+                        criteriaFront += 'Номер на сметка: ' + criterionObject.field7 + '<br/>'
+                        criteriaFront += 'Размер на кредит: ' + criterionObject.field8 + '<br/>'
+                        criteriaFront += 'Валута: ' + criterionObject.field9 + '<br/>'
+                        criteriaFront += 'КИ идентификатор: ' + criterionObject.field10 + '<br/>'
+                        criteriaFront += 'Вид на документ: ' + criterionObject.field11 + '<br/>'
+                        criteriaFront += 'Описание: ' + criterionObject.field12 + '<br/>'
 
                     header = Paragraph(u''' <strong> ПРИЛОЖЕНИЕ КЪМ ПРОТОКОЛ: (%s) </strong>'''%(str(requestObject.protocolID.id).zfill(5)),styleBoldCenter)
                     textBeforeTable = Paragraph(u'''Долуописаните документи бяха предадени на представител на ДСК със забележка: 
@@ -256,15 +259,18 @@ class Office(View):
                     for eachRequest in missingRequests:
                         requestObject = Requests.objects.select_related().get(id=int(eachRequest))
                         criterionObject = Criterion.objects.get(documentID = requestObject.documentID)                        
-                        criteriaFront += 'Индекс 1: ' + criterionObject.field1 + '<br/>'
-                        criteriaFront += 'Индекс 2: ' + criterionObject.field2 + '<br/>'
-                        criteriaFront += 'Индекс 3: ' + criterionObject.field3 + '<br/>'
-                        criteriaFront += 'Индекс 4: ' + criterionObject.field4 + '<br/>'
-                        criteriaFront += 'Индекс 5: ' + criterionObject.field5 + '<br/>'
-                        criteriaFront += 'Индекс 6: ' + criterionObject.field6 + '<br/>'
-                        criteriaFront += 'Индекс 7: ' + criterionObject.field7 + '<br/>'
-                        criteriaFront += 'Индекс 8: ' + criterionObject.field8 + '<br/>'
-                        criteriaFront += 'Индекс 9: ' + criterionObject.field9 + '<br/>'
+                        criteriaFront += 'Име на регион: ' + criterionObject.field1 + '<br/>'
+                        criteriaFront += 'Име на клон: ' + criterionObject.field2 + '<br/>'
+                        criteriaFront += 'Клиентски номер: ' + criterionObject.field3 + '<br/>'
+                        criteriaFront += 'ЕИК/БУЛСТАТ: ' + criterionObject.field4 + '<br/>'
+                        criteriaFront += 'Име на клиент: ' + criterionObject.field5 + '<br/>'
+                        criteriaFront += 'Дата на договор: ' + criterionObject.field6 + '<br/>'
+                        criteriaFront += 'Номер на сметка: ' + criterionObject.field7 + '<br/>'
+                        criteriaFront += 'Размер на кредит: ' + criterionObject.field8 + '<br/>'
+                        criteriaFront += 'Валута: ' + criterionObject.field9 + '<br/>'
+                        criteriaFront += 'КИ идентификатор: ' + criterionObject.field10 + '<br/>'
+                        criteriaFront += 'Вид на документ: ' + criterionObject.field11 + '<br/>'
+                        criteriaFront += 'Описание: ' + criterionObject.field12 + '<br/>'
 
                     header = Paragraph(u''' <strong> ПРИЛОЖЕНИЕ КЪМ ПРОТОКОЛ: (%s) </strong>'''%(str(requestObject.protocolID.id).zfill(5)),styleBoldCenter)
                     textBeforeTable = Paragraph(u'''Долуописаните документи бяха предадени на представител на ДСК със забележка: 
@@ -338,6 +344,8 @@ class Office(View):
             # documentData = list(Document.objects.filter(active=True).values_list('id', flat=True))
             # criteriaData = 
             searchButton = request.POST.get('searchButton', '')
+            protocolButton = request.POST.get('protocolButton', '')
+            listButton = request.POST.get('listButton', '')
             if searchButton != '':
                 criteriaData=Criterion.objects.select_related().filter(
                                                                         Q(field1__icontains = fields['field1']),
@@ -353,7 +361,7 @@ class Office(View):
                                                                     )
 
                 return render_to_response('move/list.html', locals(), context)
-            else:
+            elif protocolButton != '':
                 centralDocuments = request.POST.get('centralDocuments', '').split(',')
                 archiveDocuments = request.POST.get('archiveDocuments', '').split(',')
 
@@ -382,21 +390,6 @@ class Office(View):
 
                         response = HttpResponse(content_type='application/pdf')
                         response['Content-Disposition'] = 'attachment; filename="Protocol-' + str(datetime.datetime.now()) +'.pdf"'
-                        boxstyle = [
-                                        ('ALIGN',         (0,0), (-1,0), 'CENTER'),
-                                        ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
-                                        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-                                        ('TOPPADDING',    (0,0), (-1,-1), 1),
-                                        ('LEFTPADDING',   (0,0), (-1,-1), 10),
-                                        ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
-                                        ('FONT',          (0,0), (-1,0),  'b', 10),
-                                        ('FONT',          (0,1), (-1,-1),  'n', 10),
-                                    ]
-                        boxText =   [
-                                [u'Документ (критерии)', u'Забележка']
-                            ]
-
-                        boxCols = [12*cm, 5*cm]
                         signBoxCols = [6*cm,3*cm,6*cm]
                         signBoxStyle = [
                                         ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
@@ -404,40 +397,19 @@ class Office(View):
                                         ('FONT',          (0,0), (-1,-1),  'n', 10)
                                         ]
 
-                        criteriaFront = ''
-                        for eachRequest in requestList:
-                            criterionObject = Criterion.objects.get(documentID = eachRequest.documentID)
-                            # boxText.append([
-                            #     # ['Индекс 1: ' + criterionObject.field1 + '<br/>', ''],
-                            #     # ['Индекс 2: ' + criterionObject.field2 + '<br/>', ''],
-                            #     # ['Индекс 3: ' + criterionObject.field3 + '<br/>', ''],
-                            #     # ['Индекс 4: ' + criterionObject.field4 + '<br/>', ''],
-                            #     # ['Индекс 5: ' + criterionObject.field5 + '<br/>', ''],
-                            #     # ['Индекс 6: ' + criterionObject.field6 + '<br/>', ''],
-                            #     # ['Индекс 7: ' + criterionObject.field7 + '<br/>', ''],
-                            #     # ['Индекс 8: ' + criterionObject.field8 + '<br/>', ''],
-                            #     # ['Индекс 9: ' + criterionObject.field9 + '<br/>', ''],
-                            #     ['hello', '']
-                            #     ])
-                            criteriaFront += 'Индекс 1: ' + criterionObject.field1 + '<br/>'
-                            criteriaFront += 'Индекс 2: ' + criterionObject.field2 + '<br/>'
-                            criteriaFront += 'Индекс 3: ' + criterionObject.field3 + '<br/>'
-                            criteriaFront += 'Индекс 4: ' + criterionObject.field4 + '<br/>'
-                            criteriaFront += 'Индекс 5: ' + criterionObject.field5 + '<br/>'
-                            criteriaFront += 'Индекс 6: ' + criterionObject.field6 + '<br/>'
-                            criteriaFront += 'Индекс 7: ' + criterionObject.field7 + '<br/>'
-                            criteriaFront += 'Индекс 8: ' + criterionObject.field8 + '<br/>'
-                            criteriaFront += 'Индекс 9: ' + criterionObject.field9 + '<br/>'
+                        header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ <br/>
+                        за предадено за съхранение досие/документ №(%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
+                        textBeforeTable = Paragraph(u'''Днес ……………….. г. подписаните ………………………………………. 
+                        на длъжност …………………………………… и …………………………………. на длъжност  от ...........................................(поделение) 
+                        предадохме   на ……………………… на  длъжност ...................................................................................... 
+                        към Управление „Логистика“ в ЦУ    …............../............................................/ броя досиета с прилежащите им описи,
+                        оформени в ……..броя пликове/кутии. <br/>
+                        <br/> <b> Декларираме </b> с подписите си, че целостта на пликовете/кутиите не е нарушена и са запечатани,
+                        съгласно изискванията Процедура за контрол, предаване и централизирано съхранение на оригинални
+                        документи по кредитни сделки на бизнес клиенти.
+                        ''',styleNormal)
 
-                        header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
-                        ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ КЪМ ЦЕНТРАЛНО УПРАВЛЕНИЕ (%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
-                        textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на ДСК предаде
-                        на …............................................................, представител на ДСК следната Документ (критерии):
-                            ''',styleNormal)
-                        boxText.append([
-                            Paragraph(criteriaFront,styleCenter),
-                            ''
-                            ])
+
                         textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
                             ''', styleNormal)
                         signBox = [
@@ -448,32 +420,32 @@ class Office(View):
                             [u'ПРИЕЛ: ....................................',  u'',  u'ПРЕДАЛ: .....................................'],
 
                             [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
-
                         ]
+                        footerText = Paragraph('''
+                            Констатирани несъответствия от приемащата комисия:
+                            ……………………………………………………………………………………………………………………………………
+                            ……………………………………………………………………………………………………………………………………
+                            ………………………………………………………………………………………………………………………………….
+
+                            <br/><br/>Срок за отстраняване на несъответствия:…............................
+
+                            <br/><br/>За ДКАКСБК (Име, длъжност и подпис)
+                            <br/><br/>……………………………
+                            
+                            <br/><br/>За Централен архив (Име и подпис)
+                            <br/><br/>……………………………
+                            ''', styleNormal)
                         cfs=[Spacer(0, 0.3*cm),
                             header,
-                            Spacer(0, 0.3*cm),
+                            Spacer(0, 0.7*cm),
                             textBeforeTable,
-                            Spacer(0, 0.3*cm),
-                            Table(boxText, style=boxstyle, colWidths=boxCols),
                             Spacer(0, 0.3*cm),
                             textUnderTable,
                             Spacer(0, 0.3*cm),
                             Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
                             Spacer(0, 0.5*cm),
-                            Paragraph(u'________________________________________________________________________________' , styleNormal),
-                            Spacer(0, 0.3*cm),
-                            header,
-                            Spacer(0, 0.3*cm),
-                            textBeforeTable,
-                            Spacer(0, 0.3*cm),
-                            Table(boxText, style=boxstyle, colWidths=boxCols),
-                            Spacer(0, 0.3*cm),
-                            textUnderTable,
-                            Spacer(0, 0.3*cm),
-                            Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
-                            Spacer(0, 0.3*cm),
-                             ]
+                            footerText
+                            ]
                         self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
                         return response
 
@@ -500,21 +472,6 @@ class Office(View):
 
                         response = HttpResponse(content_type='application/pdf')
                         response['Content-Disposition'] = 'attachment; filename="Protocol-' + str(datetime.datetime.now()) +'.pdf"'
-                        boxstyle = [
-                                        ('ALIGN',         (0,0), (-1,0), 'CENTER'),
-                                        ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
-                                        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-                                        ('TOPPADDING',    (0,0), (-1,-1), 1),
-                                        ('LEFTPADDING',   (0,0), (-1,-1), 10),
-                                        ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
-                                        ('FONT',          (0,0), (-1,0),  'b', 10),
-                                        ('FONT',          (0,1), (-1,-1),  'n', 10),
-                                    ]
-                        boxText =   [
-                                [u'Документ (критерии)', u'Забележка']
-                            ]
-
-                        boxCols = [12*cm, 5*cm]
                         signBoxCols = [6*cm,3*cm,6*cm]
                         signBoxStyle = [
                                         ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
@@ -522,28 +479,19 @@ class Office(View):
                                         ('FONT',          (0,0), (-1,-1),  'n', 10)
                                         ]
 
-                        criteriaFront = ''
-                        for eachRequest in requestList:
-                            criterionObject = Criterion.objects.get(documentID = eachRequest.documentID)
-                            criteriaFront += 'Индекс 1: ' + criterionObject.field1 + '<br/>'
-                            criteriaFront += 'Индекс 2: ' + criterionObject.field2 + '<br/>'
-                            criteriaFront += 'Индекс 3: ' + criterionObject.field3 + '<br/>'
-                            criteriaFront += 'Индекс 4: ' + criterionObject.field4 + '<br/>'
-                            criteriaFront += 'Индекс 5: ' + criterionObject.field5 + '<br/>'
-                            criteriaFront += 'Индекс 6: ' + criterionObject.field6 + '<br/>'
-                            criteriaFront += 'Индекс 7: ' + criterionObject.field7 + '<br/>'
-                            criteriaFront += 'Индекс 8: ' + criterionObject.field8 + '<br/>'
-                            criteriaFront += 'Индекс 9: ' + criterionObject.field9 + '<br/>'
+                        header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ <br/>
+                        за предадено за съхранение досие/документ №(%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
+                        textBeforeTable = Paragraph(u'''Днес ……………….. г. подписаните ………………………………………. 
+                        на длъжност …………………………………… и …………………………………. на длъжност  от ...........................................(поделение) 
+                        предадохме   на ……………………… на  длъжност ...................................................................................... 
+                        към Управление „Логистика“ в ЦУ    …............../............................................/ броя досиета с прилежащите им описи,
+                        оформени в ……..броя пликове/кутии. <br/>
+                        <br/> <b> Декларираме </b> с подписите си, че целостта на пликовете/кутиите не е нарушена и са запечатани,
+                        съгласно изискванията Процедура за контрол, предаване и централизирано съхранение на оригинални
+                        документи по кредитни сделки на бизнес клиенти.
+                        ''',styleNormal)
 
-                        header = Paragraph(u''' <strong> ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ
-                        ЗА ПРЕДАВАНЕ НА ДОКУМЕНТИ КЪМ АРХИВ (%s) </strong>'''%(str(newProtocol.id).zfill(5)),styleBoldCenter)
-                        textBeforeTable = Paragraph(u'''Долуподписаният …................................................................, представител на ДСК предаде
-                        на …............................................................, представител на ДСК следната Документ (критерии):
-                            ''',styleNormal)
-                        boxText.append([
-                            Paragraph(criteriaFront,styleCenter),
-                            ''
-                            ])
+
                         textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра, по един за всяка от страните.<br/><br/>
                             ''', styleNormal)
                         signBox = [
@@ -554,34 +502,70 @@ class Office(View):
                             [u'ПРИЕЛ: ....................................',  u'',  u'ПРЕДАЛ: .....................................'],
 
                             [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
-
                         ]
-                        cfs=[Spacer(0, 0.5*cm),
+                        footerText = Paragraph('''
+                            Констатирани несъответствия от приемащата комисия:
+                            ……………………………………………………………………………………………………………………………………
+                            ……………………………………………………………………………………………………………………………………
+                            ………………………………………………………………………………………………………………………………….
+
+                            <br/><br/>Срок за отстраняване на несъответствия:…............................
+
+                            <br/><br/>За ДКАКСБК (Име, длъжност и подпис)
+                            <br/><br/>……………………………
+                            
+                            <br/><br/>За Централен архив (Име и подпис)
+                            <br/><br/>……………………………
+                            ''', styleNormal)
+                        cfs=[Spacer(0, 0.3*cm),
                             header,
-                            Spacer(0, 0.5*cm),
-                            textBeforeTable,
-                            Spacer(0, 0.5*cm),
-                            Table(boxText, style=boxstyle, colWidths=boxCols),
-                            Spacer(0, 0.5*cm),
-                            textUnderTable,
-                            Spacer(0, 0.5*cm),
-                            Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
                             Spacer(0, 0.7*cm),
-                            Paragraph(u'________________________________________________________________________________' , styleNormal),
-                            Spacer(0, 0.5*cm),
-                            header,
-                            Spacer(0, 0.5*cm),
                             textBeforeTable,
-                            Spacer(0, 0.5*cm),
-                            Table(boxText, style=boxstyle, colWidths=boxCols),
-                            Spacer(0, 0.5*cm),
+                            Spacer(0, 0.3*cm),
                             textUnderTable,
-                            Spacer(0, 0.5*cm),
+                            Spacer(0, 0.3*cm),
                             Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
-                            Spacer(0, 0.7*cm),
-                             ]
+                            Spacer(0, 0.5*cm),
+                            footerText
+                            ]
                         self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
                         return response
+            elif listButton != '':
+                text = Paragraph(u'ОПИС',styleNormal)
+                if centralDocuments:
+                    boxTextCentral = []
+                    for eachDocument in centralDocuments:
+                        criterionObject = Criterion.objects.filter(documentID = int(eachDocument))
+                        boxTextCentral.append(
+                                                [
+                                                Paragraph(
+                                                    criterionObject.field1 + '</br>'
+                                                    criterionObject.field2 + '</br>'
+                                                    criterionObject.field3 + '</br>'
+                                                    criterionObject.field4 + '</br>'
+                                                    criterionObject.field5 + '</br>'
+                                                    criterionObject.field6 + '</br>'
+                                                    criterionObject.field7 + '</br>'
+                                                    criterionObject.field8 + '</br>'
+                                                    criterionObject.field9 + '</br>'
+                                                    criterionObject.field10 + '</br>'
+                                                    criterionObject.field11 + '</br>'
+                                                    criterionObject.field12 + '</br>'
+                                                    , styleNormal),
+                                                ''
+                                                ]
+                                            )
+                    cfs_Central=[
+                                    Spacer(0, 0.2*cm),
+                                    text,
+                                    Spacer(0, 0.5*cm),
+                                    Table(boxTextOriginal, style=boxstyle, colWidths=boxCols),
+                                    Spacer(0, 1*cm),
+                                    PageBreak()
+                                ]
+                    self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
+                    return response
+
 
             return render_to_response('move/error.html', locals(), context)
 
@@ -592,6 +576,7 @@ class Office(View):
             frontData = []
             documentData = Document.objects.filter(active=True)
             for eachDocument in documentData:
+                print (eachDocument.id)
                 frontData.append({
                     'document': eachDocument,
                     'fields': Criterion.objects.get(documentID = eachDocument.id),
@@ -622,7 +607,7 @@ class Office(View):
                     for record in csvReader:
                         mainarray.append(record)
                     for eachElement in mainarray:
-                        if len(eachElement) != 9:
+                        if len(eachElement) != 12:
                             return render_to_response('create/file_struct_error.html', context)
                     else:
                         if len(mainarray) != recordsCount:
@@ -650,6 +635,9 @@ class Office(View):
                                                                 field7 = fields[6],
                                                                 field8 = fields[7],
                                                                 field9 = fields[8],
+                                                                field10 = fields[9],
+                                                                field11 = fields[10],
+                                                                field12 = fields[11],
                                                            )
                                                 )
                             Criterion.objects.bulk_create(criterionsList)
@@ -665,7 +653,7 @@ class Office(View):
         def post(self,request):
             context = RequestContext(request)
             fields = {}
-            for i in range(1,10):
+            for i in range(1,13):
                 fields['field' + str(i)] = request.POST.get('field' + str(i), '')
             newDocument = Document.objects.create(
                                                         active = True,
@@ -689,6 +677,9 @@ class Office(View):
                                                 field7 = fields['field7'],
                                                 field8 = fields['field8'],
                                                 field9 = fields['field9'],
+                                                field10 = fields['field10'],
+                                                field11 = fields['field11'],
+                                                field12 = fields['field12'],
                                            )
                                 )
             Criterion.objects.bulk_create(criterionsList)
