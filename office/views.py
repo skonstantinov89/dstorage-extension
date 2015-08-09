@@ -363,6 +363,9 @@ class Office(View):
                                                                         Q(field7__icontains = fields['field7']),
                                                                         Q(field8__icontains = fields['field8']),
                                                                         Q(field9__icontains = fields['field9']),
+                                                                        Q(field10__icontains = fields['field10']),
+                                                                        Q(field11__icontains = fields['field11']),
+                                                                        Q(field12__icontains = fields['field12']),
                                                                         Q(documentID__status='in-warehouse')
                                                                     )
 
