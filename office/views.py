@@ -366,7 +366,8 @@ class Office(View):
                                                                         Q(field10__icontains = fields['field10']),
                                                                         Q(field11__icontains = fields['field11']),
                                                                         Q(field12__icontains = fields['field12']),
-                                                                        Q(documentID__status='in-warehouse')
+                                                                        Q(documentID__status='in-warehouse'),
+                                                                        Q(documentID__location='storage 1'),
                                                                     )
 
                 return render_to_response('move/list.html', locals(), context)
