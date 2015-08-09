@@ -20,8 +20,10 @@ from central_management.views import Central
 
 urlpatterns = [
     # url(r'home$', ''''),
-    url(r'receipt$',   Central.receipt.as_view(),  name='receipt'),
-    url(r'preview$',   Central.preview.as_view(),  name='preview'),
-    url(r'search$',    Central.search.as_view(),  name='search'),
-    url(r'$',          Central.Index.as_view(),    name='index')
+    url(r'preview$',        Central.preview.as_view(),  name='preview'),
+    url(r'receipt$',        Central.receipt.as_view(),  name='receipt'),
+    url(r'search$',         Central.search.as_view(),  name='search'),
+    url(r'move-archive',    Central.moveToArchive.as_view(),  name='moveToArchive'),
+    url(r'conformation',    Central.conformation.as_view(),  name='conformation'),
+    url(r'$',               Central.Index.as_view(),    name='index')
 ]

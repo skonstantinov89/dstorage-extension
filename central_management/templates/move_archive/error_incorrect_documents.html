@@ -1,0 +1,14 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+  <meta http-equiv="refresh" content="5;url=/central-management">
+    <div class="jumbotron">
+      <div class="container">
+        <h2 style='color:red'>Заявката за прехвърляне на документи не беше завършена успешно!</h2>
+        <p> Моля върнете се преминете през стъпките отново!  </br>
+        <em> Не е разрешено да изпращате вече изпратен документ!</em>
+        </p>
+      </div>
+    </div>
+    {%endblock%}

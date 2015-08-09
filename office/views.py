@@ -344,7 +344,7 @@ class Office(View):
         def post(self, request):
             context = RequestContext(request)
             fields = {}
-            for i in range(1,10):
+            for i in range(1,13):
                 fields['field' + str(i)] = request.POST.get('field' + str(i), '')
 
             # documentData = list(Document.objects.filter(active=True).values_list('id', flat=True))
@@ -375,8 +375,16 @@ class Office(View):
                 centralDocuments = request.POST.get('centralDocuments', '').split(',')
                 archiveDocuments = request.POST.get('archiveDocuments', '').split(',')
 
-                requestList = []
+                if len(centralDocuments) == 1 and centralDocuments[0] == '':
+                    centralDocuments = []
+
+                if len(archiveDocuments) == 1 and archiveDocuments[0] == '':
+                    archiveDocuments = []
+
+                cfs_Central = []
+                cfs_Archive = []
                 if centralDocuments:
+                    requestList = []
                     newProtocol = Protocols.objects.create(
                                                 userID = request.user,
                                                 requestDate = datetime.datetime.now(),
@@ -392,7 +400,7 @@ class Office(View):
                                                        )
                                                 )
                             currentDocument = Document.objects.get(id=int(eachDocument))
-                            if currentDocument.status == 'in-courier' and currentDocument.location == 'storage 1':
+                            if currentDocument.status == 'in-courier':
                                 requestList.pop()
                                 newProtocol.delete()
                                 return render_to_response('move/error_incorrect_documents.html', context)
@@ -447,10 +455,10 @@ class Office(View):
                             <br/><br/>За ДКАКСБК (Име, длъжност и подпис)
                             <br/><br/>……………………………
                             
-                            <br/><br/>За Централен архив (Име и подпис)
+                            <br/><br/>За Централно управление (Име и подпис)
                             <br/><br/>……………………………
                             ''', styleNormal)
-                        cfs=[Spacer(0, 0.3*cm),
+                        cfs_Central=[Spacer(0, 0.3*cm),
                             header,
                             Spacer(0, 0.7*cm),
                             textBeforeTable,
@@ -459,20 +467,20 @@ class Office(View):
                             Spacer(0, 0.3*cm),
                             Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
                             Spacer(0, 0.5*cm),
-                            footerText
+                            footerText,
+                            PageBreak()
                             ]
-                        self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
-                        return response
 
-                elif archiveDocuments:
+                if archiveDocuments:
+                    requestList = []
                     newProtocol = Protocols.objects.create(
                                                 userID = request.user,
                                                 requestDate = datetime.datetime.now(),
                                                 fromLocation = 'storage 1', # office
-                                                toLocation = 'storage 2', # central
+                                                toLocation = 'storage 3', # archive
                                             )
-                    for eachDocument in centralDocuments:
-                        if eachDocument in archiveDocuments:
+                    for eachDocument in archiveDocuments:
+                        if eachDocument not in centralDocuments:
                             requestList.append(Requests(
                                                             documentID = Document.objects.get(id=int(eachDocument)),
                                                             status = 'in-progress',
@@ -480,7 +488,7 @@ class Office(View):
                                                        )
                                                 )
                             currentDocument = Document.objects.get(id=int(eachDocument))
-                            if currentDocument.status == 'in-courier' and currentDocument.location == 'storage 1':
+                            if currentDocument.status == 'in-courier':
                                 requestList.pop()
                                 newProtocol.delete()
                                 return render_to_response('move/error_incorrect_documents.html', context)
@@ -537,7 +545,7 @@ class Office(View):
                             <br/><br/>За Централен архив (Име и подпис)
                             <br/><br/>……………………………
                             ''', styleNormal)
-                        cfs=[Spacer(0, 0.3*cm),
+                        cfs_Archive=[Spacer(0, 0.3*cm),
                             header,
                             Spacer(0, 0.7*cm),
                             textBeforeTable,
@@ -548,8 +556,8 @@ class Office(View):
                             Spacer(0, 0.5*cm),
                             footerText
                             ]
-                        self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
-                        return response
+                self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs_Central + cfs_Archive)
+                return response
             elif listButton != '':
                 response = HttpResponse(content_type='application/pdf')
                 response['Content-Disposition'] = 'attachment; filename="Document-list-' + str(datetime.datetime.now()) +'.pdf"'
@@ -706,23 +714,22 @@ class Office(View):
                                                         userID = request.user
                                                   )
             criterionsList = []
-            for eachField in fields:
-                criterionsList.append(Criterion(
-                                                documentID = newDocument,
-                                                field1 = fields['field1'],
-                                                field2 = fields['field2'],
-                                                field3 = fields['field3'],
-                                                field4 = fields['field4'],
-                                                field5 = fields['field5'],
-                                                field6 = fields['field6'],
-                                                field7 = fields['field7'],
-                                                field8 = fields['field8'],
-                                                field9 = fields['field9'],
-                                                field10 = fields['field10'],
-                                                field11 = fields['field11'],
-                                                field12 = fields['field12'],
-                                           )
-                                )
+            criterionsList.append(Criterion(
+                                            documentID = newDocument,
+                                            field1 = fields['field1'],
+                                            field2 = fields['field2'],
+                                            field3 = fields['field3'],
+                                            field4 = fields['field4'],
+                                            field5 = fields['field5'],
+                                            field6 = fields['field6'],
+                                            field7 = fields['field7'],
+                                            field8 = fields['field8'],
+                                            field9 = fields['field9'],
+                                            field10 = fields['field10'],
+                                            field11 = fields['field11'],
+                                            field12 = fields['field12'],
+                                       )
+                            )
             Criterion.objects.bulk_create(criterionsList)
             return render_to_response ('create/success.html', context)
 

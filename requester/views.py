@@ -86,7 +86,7 @@ class Requester(View):
         def post(self,request):
             context = RequestContext(request)
             fields={}
-            for i in range(1,10):
+            for i in range(1,13):
                 fields['field' + str(i)] = request.POST.get('field' + str(i), '')
             searchButton = request.POST.get('searchButton', '')
             requestSubmit = request.POST.get('requestSubmit', '')
@@ -101,6 +101,9 @@ class Requester(View):
                                                             Q(field7__icontains = fields['field7']),
                                                             Q(field8__icontains = fields['field8']),
                                                             Q(field9__icontains = fields['field9']),
+                                                            Q(field9__icontains = fields['field10']),
+                                                            Q(field9__icontains = fields['field11']),
+                                                            Q(field9__icontains = fields['field12']),
                                                             Q(documentID__status='in-warehouse')
                                                         )
                 return render_to_response('return_requests/list.html', locals(), context)
@@ -108,17 +111,116 @@ class Requester(View):
                 pass
                 #TODO
                 # requestedDocuments = request.POST.get('requestedDocuments', '').split(',')
-                # if len(requestedDocuments) > 0 and requestDocument[0] != '':
+                # if len(requestedDocuments) == 1 and requestDocument[0] != '':
 
+                #     newProtocol = Protocols.objects.create(
+                #                                                 userID = request.user,
+                #                                                 requestDate = datetime.datetime.now(),
+                #                                                 fromLocation = criterionObject.documentID.location,
+                #                                                 toLocation = 'requester', # requester
+                #                                             )
                 #     for eachDocument in requestedDocuments:
-                #         criterionObject = Criterion.objects.select_related().get(documentID = int(eachDocument))
+                #         currentDocument = Document.objects.get(id=int(eachDocument))
+                #         requestList.append(Requests(
+                #                                         documentID = currentDocument),
+                #                                         status = 'in-progress',
+                #                                         protocolID = newProtocol
+                #                                     )
+                #                                 )
+                #         if currentDocument.status == 'in-courier':
+                #             requestList.pop()
+                #             newProtocol.delete()
+                #             return render_to_response('move/error_incorrect_documents.html', context)
+                #         else:
+                #             currentDocument.status = 'in-courier'
+                #             currentDocument.save()
 
-                #         newProtocol = Protocols.objects.create(
-                #                                                     userID = request.user,
-                #                                                     requestDate = datetime.datetime.now(),
-                #                                                     fromLocation = criterionObject.documentID.location,
-                #                                                     toLocation = 'requester', # central
-                #                                                 )
+
+
+
+                #     response = HttpResponse(content_type='application/pdf')
+                #     response['Content-Disposition'] = 'attachment; filename="Protocol-for-incorrects-' + str(datetime.datetime.now()) +'.pdf"'
+                #     boxstyle = [
+                #                     ('ALIGN',         (0,0), (-1,0), 'CENTER'),
+                #                     ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
+                #                     ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                #                     ('TOPPADDING',    (0,0), (-1,-1), 1),
+                #                     ('LEFTPADDING',   (0,0), (-1,-1), 10),
+                #                     ('GRID',          (0,0), (-1,-1), 0.3, colors.black),
+                #                     ('FONT',          (0,0), (-1,0),  'b', 10),
+                #                     ('FONT',          (0,1), (-1,-1),  'n', 10),
+                #                 ]
+                #     boxText =   [
+                #             [u'Документ (критерии)', u'Забележка']
+                #         ]
+
+                #     boxCols = [12*cm, 5*cm]
+                #     signBoxCols = [6*cm,3*cm,6*cm]
+                #     signBoxStyle = [
+                #                     ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
+                #                     ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                #                     ('FONT',          (0,0), (-1,-1),  'n', 10)
+                #                     ]
+
+                #     criteriaFront = ''
+                #     for eachRequest in requestedDocuments:
+                #         criterionObject = Criterion.objects.get(documentID = int(eachRequest))
+                #         criteriaFront += 'Име на регион: ' + criterionObject.field1 + '<br/>'
+                #         criteriaFront += 'Име на клон: ' + criterionObject.field2 + '<br/>'
+                #         criteriaFront += 'Клиентски номер: ' + criterionObject.field3 + '<br/>'
+                #         criteriaFront += 'ЕИК/БУЛСТАТ: ' + criterionObject.field4 + '<br/>'
+                #         criteriaFront += 'Име на клиент: ' + criterionObject.field5 + '<br/>'
+                #         criteriaFront += 'Дата на договор: ' + criterionObject.field6 + '<br/>'
+                #         criteriaFront += 'Номер на сметка: ' + criterionObject.field7 + '<br/>'
+                #         criteriaFront += 'Размер на кредит: ' + criterionObject.field8 + '<br/>'
+                #         criteriaFront += 'Валута: ' + criterionObject.field9 + '<br/>'
+                #         criteriaFront += 'КИ идентификатор: ' + criterionObject.field10 + '<br/>'
+                #         criteriaFront += 'Вид на документ: ' + criterionObject.field11 + '<br/>'
+                #         criteriaFront += 'Описание: ' + criterionObject.field12 + '<br/>'
+
+                #     header = Paragraph(u''' <strong> ПРИЛОЖЕНИЕ КЪМ ПРОТОКОЛ: (%s) </strong>'''%(str(requestObject.protocolID.id).zfill(5)),styleBoldCenter)
+                #     textBeforeTable = Paragraph(u'''Долуописаните документи бяха предадени на заявител от ДСК.
+                #         ''',styleNormal)
+                #     boxText.append([
+                #         Paragraph(criteriaFront,styleCenter),
+                #         Paragraph('', styleCenter)
+                #         ])
+                #     textUnderTable = Paragraph(u'''Настоящия протокол се подписва в два еднакви екземпляра,
+                #      по един за всяка от страните и се прикрепя към единия протокол и се изпраща обратно за другия.<br/><br/>
+                #         ''', styleNormal)
+                #     signBox = [
+                #         [u'Дата: ' + datetime.datetime.now().strftime("%d.%m.%Y")+u'г.', u'', u''],
+                #         [u'', u''],
+                #         [u'ПРИЕЛ: ....................................',  u'',  u'ПРЕДАЛ: .....................................'],
+                #         [u'Име:  .........................................',  u'',  u'Име: ..............................................'],
+                #     ]
+                #     cfs=[Spacer(0, 0.3*cm),
+                #         header,
+                #         Spacer(0, 0.3*cm),
+                #         textBeforeTable,
+                #         Spacer(0, 0.3*cm),
+                #         Table(boxText, style=boxstyle, colWidths=boxCols),
+                #         Spacer(0, 0.3*cm),
+                #         textUnderTable,
+                #         Spacer(0, 0.3*cm),
+                #         Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                #         Spacer(0, 0.5*cm),
+                #         Paragraph(u'________________________________________________________________________________' , styleNormal),
+                #         Spacer(0, 0.3*cm),
+                #         header,
+                #         Spacer(0, 0.3*cm),
+                #         textBeforeTable,
+                #         Spacer(0, 0.3*cm),
+                #         Table(boxText, style=boxstyle, colWidths=boxCols),
+                #         Spacer(0, 0.3*cm),
+                #         textUnderTable,
+                #         Spacer(0, 0.3*cm),
+                #         Table(signBox, style=signBoxStyle, colWidths=signBoxCols),
+                #         Spacer(0, 0.3*cm),
+                #          ]
+                #     self.RequestTemplate(response, bottomMargin=1.3*cm, topMargin=1.3*cm).build(cfs)
+                #     return response
+
 
 
 

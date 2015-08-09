@@ -19,8 +19,8 @@
             {% if eachElement.documentID.status != 'incorrect-input' %}
 
             <tr align='left'>
-                <td style="vertical-align:middle"> <p align="center"> {{eachElement.request.protocolID.id|stringformat:"05d"}} </p> </td>
-                <td style="vertical-align:middle"> <p align="center"> {{eachElement.request.documentID.id|stringformat:"05d"}} </p></td>
+                <td style="vertical-align:middle"> <p align="center"> {{eachElement.request.protocolID.id|stringformat:"06d"}} </p> </td>
+                <td style="vertical-align:middle"> <p align="center"> {{eachElement.request.documentID.id|stringformat:"06d"}} </p></td>
                 <td style="vertical-align:middle"> 
                         Име на регион:      {{eachElement.document.field1}} </br>
                         Име на клон:        {{eachElement.document.field2}} </br>

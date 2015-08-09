@@ -18,7 +18,7 @@
             {% if eachElement.documentID.status != 'incorrect-input' %}
 
             <tr align='left'>
-                <td style="vertical-align:middle"> {{eachElement.documentID.id}} </td>
+                <td style="vertical-align:middle"> {{eachElement.documentID.id|stringformat:"06d"}} </td>
                 <td style="vertical-align:middle"> 
                         Име на регион:      {{eachElement.field1}} </br>
                         Име на клон:        {{eachElement.field2}} </br>
@@ -45,7 +45,7 @@
                 </td>
                 <td style="vertical-align:middle"> 
             <div id='move'>
-                <button class='btn btn-success btn-block request_document' value='{{eachElement.documentID.id}}'>Заяви</button>
+                <button class='btn btn-primary btn-block add_to_archive' value='{{eachElement.documentID.id}}'>Добави в списък за архив</button>
             </div>  
 
                 </td>
@@ -58,13 +58,15 @@
     <div class='col-md-offset-4' align='left'>
         <form method='post' id='submit_to_move'> 
         {% csrf_token %}
+        </br>
             <label>
-              Списък със заявени документи:
-            <input type='text' class='form-control'name='requestedDocuments' id='requestedDocuments' />
+              Списък с документи за изпращане за архив:
+            <input type='text' class='form-control' name='archiveDocuments' id='archiveDocuments' />
         </label>
         </br>
         <div class='col-md-7'>
-            <button type='submit' class='btn btn-primary btn-block' name='requestSubmit' id='requestSubmit' value='submit'> Потвърди </button>
+            <button type='submit' class='btn btn-primary btn-block' name='protocolButton' value = 'protocol' id='submit'> Разпечатай протокол </button>
+            <button type='submit' class='btn btn-success btn-block' name='listButton' value = 'list' id='submit'> Разпечатай опис </button>
         </div>
     </form>
     </div>
@@ -74,7 +76,6 @@
 
 
     <script type="text/javascript">
-    var centralArrayID = new Array()
     var archiveArrayID = new Array()
 
     $(document).ready(function(){
@@ -105,34 +106,33 @@
         });
     });
 
-    $(document).on('click','.request_document',function(){
+    $(document).on('click','.add_to_archive', function(){
         var value= $(this).val();
-        centralArrayID.push(value);
+        archiveArrayID.push(value);
 
-        $(this).next().prop('disabled', true);
-        $(this).replaceWith("<button class='btn btn-block btn-warning cancel-request' value="+ value +"> Откажи </button>");
+        $(this).prev().prop("disabled", true);
+        $(this).replaceWith("<button class='btn btn-block btn-warning cancel-archive' value="+ value +"> Откажи </button>");
 
-        $('#requestedDocuments').prop('value', centralArrayID);
+        $('#archiveDocuments').prop('value', archiveArrayID);
     });
 
-    $(document).on('click','.cancel-request',function(){
+    $(document).on('click','.cancel-archive',function(){
         
         var value = $(this).val();
-        var index = centralArrayID.indexOf(value);
+        var index = archiveArrayID.indexOf(value);
         if (index > -1){
-            centralArrayID.splice(index, 1);
+            archiveArrayID.splice(index, 1);
         }
-        $(this).replaceWith("<button class='btn btn-success btn-block request_document' value="+ value +"> Заяви </button>");
+        $(this).prev().prop('disabled', false);
+        $(this).replaceWith("<button class='btn btn-primary btn-block add_to_archive' value="+ value +"> Добави в списък за архив </button>");
 
-        $('#requestedDocuments').prop('value', centralArrayID);
 
+        $('#archiveDocuments').prop('value', archiveArrayID);
     });
-
     $(document).on('click','#submit', function(event){
-        var requestValue = $('#requestedDocuments').val();
         var archiveValue = $('#archiveDocuments').val();
 
-        if (requestValue.length > 0){
+        if (archiveValue.length > 0){
             $('#submit_to_move').submit();
         }
         else{
