@@ -28,6 +28,8 @@ class LoginClass(View):
             return user.groups.filter(name='central').exists()
         def is_requester_user(self,user):
             return user.groups.filter(name='requester').exists()
+        def is_superuser(self,user):
+            return user.groups.filter(name='office_central').exists()
 
         def get(self, request):
             context = RequestContext(request)
@@ -38,6 +40,8 @@ class LoginClass(View):
                     return redirect('/central-management')
                 elif self.is_requester_user(request.user):
                     return redirect('/requester')
+                elif self.is_superuser(request.user):
+                    return redirect('/super-user')
 
                 else:
                     logout(request)

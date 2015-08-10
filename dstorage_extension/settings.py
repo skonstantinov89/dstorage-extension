@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'central_management',
     'system',
     'requester',
+    'super_user',
     'debug_toolbar'
 )
 

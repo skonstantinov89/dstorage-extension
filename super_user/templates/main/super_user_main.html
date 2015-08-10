@@ -1,0 +1,29 @@
+<!doctype html>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block main %}
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+        <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h2>Заявяване на документи</h2>
+        <p>Чрез текущо заредения модул имате възможност за действия с на документи намиращи се в в Офис и Централно управление.</p>
+      </div>
+    </div>
+
+<div class="container">
+<!-- Example row of columns -->
+<div class="row">
+  <div class="col-md-4">
+    <h2>Централно управление</h2>
+    <p><a class="btn btn-default btn-block" href="/central-management" role="button">Модул Централно управление</a></p>
+  </div>
+  <div class="col-md-4">
+    <h2>Офис</h2>
+    <p><a class="btn btn-default btn-block" href="/office" role="button">Модул Офис</a></p>
+ </div>
+  <div class="col-md-4">
+  </div>
+</div>
+      <hr>
+{% endblock %}
